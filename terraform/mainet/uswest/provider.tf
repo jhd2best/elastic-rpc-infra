@@ -15,6 +15,6 @@ provider "consul" {
 }
 
 provider "nomad" {
-  address = module.elastic.nomad.nomad_addr
+  address   = module.elastic.nomad.nomad_addr
   secret_id = module.elastic.nomad.nomad_master_token
 }

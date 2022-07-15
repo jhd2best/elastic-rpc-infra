@@ -18,7 +18,7 @@ data "aws_security_group" "default" {
 
 locals {
   image_id                  = data.aws_ssm_parameter.image_id.value
-  domain                    = "${var.env}.${var.domain}"
+  domain                    = var.domain
   zone_id                   = var.zone_id
   vpc_id                    = var.vpc.id
   subnet_ids                = var.public_subnet_ids

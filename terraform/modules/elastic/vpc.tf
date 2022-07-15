@@ -9,33 +9,33 @@ locals {
 resource "aws_vpc" "vpc" {
   cidr_block = "10.${var.vpc_index}.0.0/16"
   tags = {
-    Name    = "${var.env}-${local.project}"
+    Name = "${var.env}-${local.project}"
   }
 }
 
 resource "aws_subnet" "public" {
   count                   = length(local.zones)
-  cidr_block              = "10.${var.vpc_index}.${count.index*16}.0/20"
+  cidr_block              = "10.${var.vpc_index}.${count.index * 16}.0/20"
   availability_zone       = local.zones[count.index]
   vpc_id                  = aws_vpc.vpc.id
-  map_public_ip_on_launch = true
+  map_public_ip_on_launch = false
 
   tags = {
-    Name    = "${var.env}-${local.project}"
+    Name = "${var.env}-${local.project}"
   }
 }
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name    = "${var.env}-${local.project}"
+    Name = "${var.env}-${local.project}"
   }
 }
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.vpc.id
   tags = {
-    Name    = "${var.env}-${local.project}"
+    Name = "${var.env}-${local.project}"
   }
 }
 

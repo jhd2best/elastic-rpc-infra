@@ -40,16 +40,18 @@ data "aws_key_pair" "harmony" {
 }
 
 module "nomad" {
-  source         = "../nomad"
-  region         = var.region
-  domain         = var.domain
-  env            = var.env
-  project        = "elastic-rpc-${var.env}"
-  cluster_id     = "elastic-rpc-${var.env}"
-  ssh_key_name   = data.aws_key_pair.harmony.key_name
-  zone_id        = var.web_zone_id
-  vpc            = aws_vpc.vpc
-  cluster_groups = local.groups
-  fabio_apps     = {}
+  source            = "../nomad"
+  nomad_version     = "1.3.2"
+  consul_version    = "1.12.3"
+  region            = var.region
+  domain            = "${var.region}.${var.env}.${var.domain}"
+  env               = var.env
+  project           = "elastic-rpc-${var.env}"
+  cluster_id        = "elastic-rpc-${var.env}"
+  ssh_key_name      = data.aws_key_pair.harmony.key_name
+  zone_id           = var.web_zone_id
+  vpc               = aws_vpc.vpc
+  cluster_groups    = local.groups
+  fabio_apps        = {}
   public_subnet_ids = aws_subnet.public.*.id
 }

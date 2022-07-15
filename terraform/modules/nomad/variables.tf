@@ -4,7 +4,7 @@ variable "consul_version" {
 }
 
 variable "nomad_version" {
-  default     = "1.3.1"
+  default     = "1.3.2"
   description = "The nomad version to deploy"
 }
 
@@ -23,7 +23,7 @@ variable "cluster_groups" {
 }
 
 variable "fabio_apps" {
-  default     = {
+  default = {
     // subdomain = "sub" OR path = "path"
     // grpc = true/false
   }
@@ -35,7 +35,7 @@ variable "cluster_id" {
 }
 
 variable "region" {
-  description = "AWS region, e.g. us-east-1"
+  description = "Short name region, e.g. us or eu or sg"
 }
 
 variable "domain" {

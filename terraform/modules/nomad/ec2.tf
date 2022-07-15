@@ -10,7 +10,7 @@ data "template_file" "user_data" {
   template = format("%s%s%s",
     file("${path.module}/scripts/init.sh"),
     file("${path.module}/scripts/install_consul.sh"),
-    file("${path.module}/scripts/install_nomad.sh"))
+  file("${path.module}/scripts/install_nomad.sh"))
   vars = {
     group_id               = each.key
     datacenter             = "dc1"
@@ -54,13 +54,13 @@ resource "aws_security_group" "ec2_custom" {
 }
 
 resource "aws_launch_configuration" "group" {
-  for_each             = { for g in var.cluster_groups : g.id => g }
-  name_prefix          = "${var.cluster_id}-${each.key}-"
-  image_id             = local.image_id
-  instance_type        = each.value.instance_type
-  iam_instance_profile = aws_iam_instance_profile.nomad.name
-  user_data            = data.template_file.user_data[each.key].rendered
-  key_name             = var.ssh_key_name
+  for_each                    = { for g in var.cluster_groups : g.id => g }
+  name_prefix                 = "${var.cluster_id}-${each.key}-"
+  image_id                    = local.image_id
+  instance_type               = each.value.instance_type
+  iam_instance_profile        = aws_iam_instance_profile.nomad.name
+  user_data                   = data.template_file.user_data[each.key].rendered
+  key_name                    = var.ssh_key_name
   associate_public_ip_address = false
   security_groups = concat(
     [aws_security_group.ec2.id, local.default_security_group_id],

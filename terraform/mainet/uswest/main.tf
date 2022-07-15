@@ -1,20 +1,20 @@
 locals {
-  region = "us-west-1"
-  env = "mainet"
-  domain = "t.hmny.io"
+  region    = "us"
+  env       = "mainet"
+  domain    = "t.hmny.io"
   vpc_index = 51
 }
 
 data "aws_route53_zone" "root" {
-  name     = local.domain
+  name = local.domain
 }
 
 module "elastic" {
-  source = "../../modules/elastic"
-  domain = local.domain
-  env    = local.env
-  region = local.region
-  vpc_index = local.vpc_index
+  source      = "../../modules/elastic"
+  domain      = local.domain
+  env         = local.env
+  region      = local.region
+  vpc_index   = local.vpc_index
   web_zone_id = data.aws_route53_zone.root.id
 }
 
@@ -24,8 +24,4 @@ module "jobs" {
   env    = local.env
   nomad  = module.elastic.nomad
   region = local.region
-}
-
-output "elastic" {
-  value = module.elastic
 }

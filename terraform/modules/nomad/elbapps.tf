@@ -35,11 +35,11 @@ resource "aws_lb_target_group" "app" {
   vpc_id               = local.vpc_id
   deregistration_delay = 1
   health_check {
-    path = each.value.health_path
-    port = each.value.health_port
-    interval = 5
+    path                = each.value.health_path
+    port                = each.value.health_port
+    interval            = 5
     unhealthy_threshold = 2
-    timeout = 3
+    timeout             = 3
   }
   tags = {
     Project = var.project
@@ -56,7 +56,7 @@ resource "aws_autoscaling_attachment" "app" {
     ])) : x => x
   }
   autoscaling_group_name = aws_autoscaling_group.group[split("@", each.key)[1]].id
-  lb_target_group_arn   = aws_lb_target_group.app[split("@", each.key)[0]].arn
+  lb_target_group_arn    = aws_lb_target_group.app[split("@", each.key)[0]].arn
 }
 
 resource "aws_lb_listener_rule" "app" {
@@ -95,11 +95,11 @@ resource "aws_lb_target_group" "fabio_apps" {
   vpc_id               = local.vpc_id
   deregistration_delay = 1
   health_check {
-    path = "/health"
-    port = 9998
-    interval = 5
+    path                = "/health"
+    port                = 9998
+    interval            = 5
     unhealthy_threshold = 2
-    timeout = 3
+    timeout             = 3
   }
   tags = {
     project = var.project
@@ -115,12 +115,12 @@ resource "aws_lb_target_group" "fabio_grpc" {
   vpc_id               = local.vpc_id
   deregistration_delay = 1
   health_check {
-    path = "/"
-    port = 9997
-    interval = 5
+    path                = "/"
+    port                = 9997
+    interval            = 5
     unhealthy_threshold = 2
-    timeout = 3
-    matcher = "0-99"
+    timeout             = 3
+    matcher             = "0-99"
   }
   tags = {
     project = var.project
@@ -131,13 +131,13 @@ resource "aws_lb_target_group" "fabio_grpc" {
 resource "aws_autoscaling_attachment" "fabio_apps" {
   for_each               = { for g in var.cluster_groups : g.id => g if g.id != "server" }
   autoscaling_group_name = aws_autoscaling_group.group[each.key].id
-  lb_target_group_arn   = aws_lb_target_group.fabio_apps.arn
+  lb_target_group_arn    = aws_lb_target_group.fabio_apps.arn
 }
 
 resource "aws_autoscaling_attachment" "fabio_grpc" {
   for_each               = { for g in var.cluster_groups : g.id => g if g.id != "server" }
   autoscaling_group_name = aws_autoscaling_group.group[each.key].id
-  lb_target_group_arn   = aws_lb_target_group.fabio_grpc.arn
+  lb_target_group_arn    = aws_lb_target_group.fabio_grpc.arn
 }
 
 resource "aws_lb_listener_rule" "fabio_apps_subdomain" {
