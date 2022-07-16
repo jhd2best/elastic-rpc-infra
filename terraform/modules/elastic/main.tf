@@ -47,6 +47,10 @@ module "nomad" {
   public_subnet_ids = aws_subnet.public.*.id
 }
 
+module "tkiv" {
+  source = "../tkiv"
+}
+
 module "jobs" {
   source = "../../modules/jobs"
   env    = var.env
