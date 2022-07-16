@@ -18,7 +18,7 @@ locals {
       id             = "client"
       instance_type  = var.instance_type
       instance_count = { min : 0, max : 15, desired : 2 },
-      security_groups = [
+      security_groups = [ # this groups are open to the whole world so used them with caution
         { protocol : "icmp", from_port : 8, to_port : 0 } # enough to enable ping
       ]
     }
@@ -37,8 +37,8 @@ module "nomad" {
   region            = var.region
   domain            = "${var.region}.${var.env}.${var.domain}"
   env               = var.env
-  project           = "elastic-rpc-${var.env}-${var.region}"
-  cluster_id        = "elastic-rpc-${var.env}-${var.region}"
+  project           = "erpc-${var.env}-${var.region}"
+  cluster_id        = "erpc-${var.env}-${var.region}"
   ssh_key_name      = data.aws_key_pair.harmony.key_name
   zone_id           = var.web_zone_id
   vpc               = aws_vpc.vpc

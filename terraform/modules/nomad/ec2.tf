@@ -55,7 +55,7 @@ resource "aws_security_group" "open" {
 
 resource "aws_launch_configuration" "group" {
   for_each                    = { for g in var.cluster_groups : g.id => g }
-  name_prefix                 = "${var.cluster_id}-${each.key}-"
+  name_prefix                 = "${var.cluster_id}-nomad-${each.key}-"
   image_id                    = local.image_id
   instance_type               = each.value.instance_type
   iam_instance_profile        = aws_iam_instance_profile.nomad.name
@@ -74,7 +74,7 @@ resource "aws_launch_configuration" "group" {
 
 resource "aws_autoscaling_group" "group" {
   for_each             = { for g in var.cluster_groups : g.id => g }
-  name                 = "${var.cluster_id}-${each.key}"
+  name                 = "${var.cluster_id}-nomad-${each.key}"
   launch_configuration = aws_launch_configuration.group[each.key].name
   desired_capacity     = each.value.instance_count.desired
   max_size             = each.value.instance_count.max

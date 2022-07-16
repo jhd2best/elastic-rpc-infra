@@ -52,6 +52,14 @@ resource "aws_elasticache_parameter_group" "redis_shard" {
     name  = "maxmemory-policy"
     value = "volatile-ttl"
   }
+  parameter {
+    name  = "maxmemory-samples"
+    value = 30
+  }
+  parameter {
+    name  = "replica-ignore-maxmemory"
+    value = "yes"
+  }
 }
 
 resource "aws_elasticache_security_group" "elastic-redis" {

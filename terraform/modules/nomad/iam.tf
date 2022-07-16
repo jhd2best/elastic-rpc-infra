@@ -18,7 +18,7 @@ EOF
 }
 
 resource "aws_iam_policy" "nomad" {
-  name   = "${var.cluster_id}-${var.region}-policy"
+  name   = "${var.cluster_id}-nomad-policy"
   policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -55,6 +55,6 @@ resource "aws_iam_role_policy_attachment" "nomad" {
 }
 
 resource "aws_iam_instance_profile" "nomad" {
-  name = "${var.cluster_id}-${var.region}-ip"
+  name = "${var.cluster_id}-nomad-ip"
   role = aws_iam_role.nomad.name
 }
