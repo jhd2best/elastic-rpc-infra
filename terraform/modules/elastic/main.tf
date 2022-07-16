@@ -19,8 +19,6 @@ locals {
       instance_type  = var.instance_type
       instance_count = { min : 0, max : 15, desired : 2 },
       security_groups = [
-        { protocol : "udp", from_port : 20000, to_port : 32000 },
-        { protocol : "tcp", from_port : 20000, to_port : 32000 },
         { protocol : "icmp", from_port : 8, to_port : 0 } # enough to enable ping
       ]
     }

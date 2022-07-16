@@ -34,13 +34,13 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     from_port   = 22
     to_port     = 22
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = [var.vpc.cidr_block]
   }
 }
 
-resource "aws_security_group" "ec2_custom" {
+resource "aws_security_group" "open" {
   for_each = { for g in var.cluster_groups : g.id => g }
-  name     = "${var.cluster_id}-${each.key}-custom"
+  name     = "${var.cluster_id}-${each.key}-open"
   vpc_id   = local.vpc_id
   dynamic "ingress" {
     for_each = each.value.security_groups
@@ -62,10 +62,8 @@ resource "aws_launch_configuration" "group" {
   user_data                   = data.template_file.user_data[each.key].rendered
   key_name                    = var.ssh_key_name
   associate_public_ip_address = false
-  security_groups = concat(
-    [aws_security_group.ec2.id, local.default_security_group_id],
-  [aws_security_group.ec2_custom[each.key].id])
-  depends_on = [aws_iam_role_policy_attachment.nomad]
+  security_groups             = concat([aws_security_group.ec2.id, local.default_security_group_id], [aws_security_group.open[each.key].id])
+  depends_on                  = [aws_iam_role_policy_attachment.nomad]
   root_block_device {
     delete_on_termination = true
   }
