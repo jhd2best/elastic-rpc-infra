@@ -18,7 +18,7 @@ resource "aws_elasticache_replication_group" "redis_shard" {
   automatic_failover_enabled = true
   multi_az_enabled           = true
   parameter_group_name       = aws_elasticache_parameter_group.redis_shard.name
-  subnet_group_name          = ""
+  subnet_group_name          = aws_elasticache_subnet_group.elastic_redis.name
   security_group_ids         = [aws_elasticache_security_group.elastic-redis.id]
 
   log_delivery_configuration {
@@ -29,12 +29,12 @@ resource "aws_elasticache_replication_group" "redis_shard" {
   }
 }
 
-resource "aws_elasticache_subnet_group" "bar" {
+resource "aws_elasticache_subnet_group" "elastic_redis" {
   name       = "elastic-rpc-redis-${var.region}-${var.env}"
   subnet_ids = aws_subnet.public.*.id
 }
 
-resource "aws_security_group" "elastic-redis" {
+resource "aws_security_group" "elastic_redis" {
   name = "elastic-rpc-redis-${var.region}-${var.env}"
   ingress {
     protocol    = "tcp"
