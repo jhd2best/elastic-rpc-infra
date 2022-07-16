@@ -261,9 +261,9 @@ scrape_configs:
     metrics_path: /metrics
 
 remote_write:
-  - url: https://prometheus-blocks-prod-us-central1.grafana.net/api/prom/push
+  - url: https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
     basic_auth:
-      username: 117965
+      username: 500382
       password: {{ key "consul/tokens/grafana-publisher" }}
 EOH
       }

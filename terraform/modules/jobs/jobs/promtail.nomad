@@ -43,7 +43,7 @@ positions:
   filename: /data/promtail_positions.yaml
 
 client:
-  url: https://57955:{{ key "consul/tokens/grafana-publisher" }}@logs-prod-us-central1.grafana.net/api/prom/push
+  url: https://249161:{{ key "consul/tokens/grafana-publisher" }}@logs-prod3.grafana.net/loki/api/v1/push
   external_labels:
     nomad_cluster: ${nomad_cluster}
     env : ${env}
