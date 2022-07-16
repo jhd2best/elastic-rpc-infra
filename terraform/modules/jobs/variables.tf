@@ -1,4 +1,3 @@
-variable "domain" {}
 variable "env" {}
 variable "region" {}
 variable "nomad" {}

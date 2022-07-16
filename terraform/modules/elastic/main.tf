@@ -28,13 +28,6 @@ locals {
   project = "elastic-rpc"
 }
 
-data "aws_caller_identity" "current" {}
-
-data "aws_security_group" "default" {
-  vpc_id = aws_vpc.vpc.id
-  name   = "default"
-}
-
 data "aws_key_pair" "harmony" {
   key_name = "harmony-node"
 }
@@ -46,12 +39,19 @@ module "nomad" {
   region            = var.region
   domain            = "${var.region}.${var.env}.${var.domain}"
   env               = var.env
-  project           = "elastic-rpc-${var.env}"
-  cluster_id        = "elastic-rpc-${var.env}"
+  project           = "elastic-rpc-${var.env}-${var.region}"
+  cluster_id        = "elastic-rpc-${var.env}-${var.region}"
   ssh_key_name      = data.aws_key_pair.harmony.key_name
   zone_id           = var.web_zone_id
   vpc               = aws_vpc.vpc
   cluster_groups    = local.groups
   fabio_apps        = {}
   public_subnet_ids = aws_subnet.public.*.id
+}
+
+module "jobs" {
+  source = "../../modules/jobs"
+  env    = var.env
+  nomad  = module.nomad
+  region = var.region
 }

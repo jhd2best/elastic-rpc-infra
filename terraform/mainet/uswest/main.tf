@@ -31,11 +31,3 @@ module "elastic" {
       redis_instance_type           = "cache.r6g.large"
   }]
 }
-
-module "jobs" {
-  source = "../../modules/jobs"
-  domain = local.domain
-  env    = local.env
-  nomad  = module.elastic.nomad
-  region = local.region
-}
