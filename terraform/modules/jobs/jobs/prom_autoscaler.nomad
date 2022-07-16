@@ -222,20 +222,6 @@ global:
     env : ${env}
 
 scrape_configs:
-  - job_name: 'portal'
-    consul_sd_configs:
-      - server: 'localhost:8500'
-        services: ['portal']
-        token: '{{ key "consul/tokens/prometheus" }}'
-    scrape_interval: 5s
-    metrics_path: /api/v1/metrics
-  - job_name: 'play'
-    consul_sd_configs:
-      - server: 'localhost:8500'
-        services: ['play']
-        token: '{{ key "consul/tokens/prometheus" }}'
-    scrape_interval: 5s
-    metrics_path: /play/api/v1/metrics
   - job_name: 'prometheus'
     static_configs:
       - targets:
@@ -253,47 +239,10 @@ scrape_configs:
     metrics_path: /v1/metrics
     params:
       format: ['prometheus']
-  - job_name: 'replicator'
+  - job_name: 'elastic_rpc'
     consul_sd_configs:
       - server: 'localhost:8500'
-        services: ['replicator', 'replicator-net']
-        token: '{{ key "consul/tokens/prometheus" }}'
-    relabel_configs:
-    - source_labels: [__meta_consul_tags]
-      regex: '.*,projectid=([^,]+),.*'
-      replacement: '$1'
-      target_label: 'projectid'
-    scrape_interval: 5s
-  - job_name: 'replicator-rooms'
-    consul_sd_configs:
-      - server: 'localhost:8500'
-        services: ['replicator-rooms', 'replicator-rooms-net']
-        token: '{{ key "consul/tokens/prometheus" }}'
-    relabel_configs:
-    - source_labels: [__meta_consul_tags]
-      regex: '.*,rsver=([^,]+),.*'
-      replacement: '$1'
-      target_label: 'rsver'
-    scrape_interval: 5s
-  - job_name: 'replicator-worlds'
-    consul_sd_configs:
-      - server: 'localhost:8500'
-        services: ['replicator-worlds', 'replicator-worlds-net']
-        token: '{{ key "consul/tokens/prometheus" }}'
-    relabel_configs:
-    - source_labels: [__meta_consul_tags]
-      regex: '.*,projectid=([^,]+),.*'
-      replacement: '$1'
-      target_label: 'projectid'
-    - source_labels: [__meta_consul_tags]
-      regex: '.*,rsver=([^,]+),.*'
-      replacement: '$1'
-      target_label: 'rsver'
-    scrape_interval: 5s
-  - job_name: 'simulator'
-    consul_sd_configs:
-      - server: 'localhost:8500'
-        services: ['simulator-worlds', 'simulator-rooms', 'rooms-multisim']
+        services: ['elastic-rpc-writer', 'elastic-rpc-reader']
         token: '{{ key "consul/tokens/prometheus" }}'
     metric_relabel_configs:
     - source_labels: [__name__]
