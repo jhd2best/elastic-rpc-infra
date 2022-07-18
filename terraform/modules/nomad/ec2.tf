@@ -2,7 +2,7 @@
 # for the cluster EC2 instances
 
 locals {
-  autoscaling_group_name = "${var.cluster_id}-server"
+  autoscaling_nomad_server_group_name = "${var.cluster_id}-nomad-server" // this has to be the same name as the one created in the aws console
 }
 
 data "template_file" "user_data" {
@@ -18,7 +18,7 @@ data "template_file" "user_data" {
     domain                 = var.domain
     cluster_id             = var.cluster_id
     server_nodes           = each.key == "server" ? each.value.instance_count.desired : ""
-    autoscaling_group_name = local.autoscaling_group_name
+    autoscaling_group_name = local.autoscaling_nomad_server_group_name
     consul_version         = var.consul_version
     nomad_version          = var.nomad_version
     consul_master_token    = random_uuid.consul_master_token.result
@@ -61,9 +61,9 @@ resource "aws_launch_configuration" "group" {
   iam_instance_profile        = aws_iam_instance_profile.nomad.name
   user_data                   = data.template_file.user_data[each.key].rendered
   key_name                    = var.ssh_key_name
-  associate_public_ip_address = false
+  associate_public_ip_address = true
   security_groups             = concat([aws_security_group.ec2.id, local.default_security_group_id], [aws_security_group.open[each.key].id])
-  depends_on                  = [aws_iam_role_policy_attachment.nomad]
+  # depends_on                  = [aws_iam_role_policy_attachment.nomad]
   root_block_device {
     delete_on_termination = true
   }

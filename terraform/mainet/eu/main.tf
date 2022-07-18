@@ -1,7 +1,7 @@
 locals {
-  region     = "us"
-  aws_region = "us-west-1"
-  env        = "mainet"
+  region     = "eu" # change this if new region or env launched
+  aws_region = "eu-central-1" # change this if new region or env launched
+  env        = "mainet" # change this if new region or env launched
   domain     = "t.hmny.io"
   vpc_index  = 51
 }
@@ -17,7 +17,7 @@ module "elastic" {
   region        = local.region
   vpc_index     = local.vpc_index
   web_zone_id   = data.aws_route53_zone.root.id
-  redis_version = "redis6.2"
+  redis_version = "redis6.x"
   shard_conf = [{
     shard_number                  = 0
     redis_shards                  = 3

@@ -34,10 +34,6 @@ resource "aws_lb" "lb" {
   internal           = false
   security_groups    = [aws_security_group.elb.id, local.default_security_group_id]
   subnets            = local.subnet_ids
-  tags = {
-    project = var.project
-    env     = var.env
-  }
 }
 
 // default listeners
