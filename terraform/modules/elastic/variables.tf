@@ -2,7 +2,7 @@ variable "region" {}
 variable "env" {}
 variable "domain" {}
 variable "web_zone_id" {}
-variable "vpc_index" {}
+variable "vpc_index" { default = 51 }
 variable "instance_type" { default = "c5.4xlarge" }
 variable "redis_version" { default = "redis6.x" }
 
