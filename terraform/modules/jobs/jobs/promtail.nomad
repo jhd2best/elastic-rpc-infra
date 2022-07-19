@@ -79,17 +79,13 @@ scrape_configs:
       target_label:  'instance'
       replacement:   '$1'
     - source_labels: [__meta_consul_tags]
-      regex: ',(?:[^,]+,){0}([^=]+)=([^,]+),.*'
-      replacement: '$2'
-      target_label: '$1'
+      regex: '.*,type=([^,]+),.*'
+      replacement: '$1'
+      target_label: 'enode_type'
     - source_labels: [__meta_consul_tags]
-      regex: ',(?:[^,]+,){1}([^=]+)=([^,]+),.*'
-      replacement: '$2'
-      target_label: '$1'
-    - source_labels: [__meta_consul_tags]
-      regex: ',(?:[^,]+,){2}([^=]+)=([^,]+),.*'
-      replacement: '$2'
-      target_label: '$1'
+      regex: '.*,shard=([^,]+),.*'
+      replacement: '$1'
+      target_label: 'shard'
     - source_labels: [__meta_consul_service_id]
       regex: '_nomad-task-([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})-.*'
       target_label:  '__path__'

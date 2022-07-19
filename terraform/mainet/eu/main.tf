@@ -8,9 +8,11 @@ terraform {
 
 
 locals {
-  region     = "eu"           # change this if new region or env launched
-  aws_region = "eu-central-1" # change this if new region or env launched
-  env        = "mainet"       # change this if new region or env launched
+  region     = "eu"                           # change this if new region or env launched
+  aws_region = "eu-central-1"                 # change this if new region or env launched
+  env        = "mainet"                       # change this if new region or env launched
+  network    = "mainnet"                      # change this if new region or env launched
+  boot_nodes = "/dnsaddr/bootstrap.t.hmny.io" # change this if new region or env launched
   domain     = "t.hmny.io"
   vpc_index  = 51
 }
@@ -19,8 +21,8 @@ provider "aws" {
   region = local.aws_region
   default_tags {
     tags = {
-      Environment = "Mainet" # change this if new region or env launched
-      Region      = "Europe" # change this if new region or env launched
+      Environment = "Mainnet" # change this if new region or env launched
+      Region      = "Europe"  # change this if new region or env launched
       Owner       = "DevOps Guild"
       Project     = "elastic-rpc-infra"
     }
@@ -45,6 +47,8 @@ module "elastic" {
   source        = "../../modules/elastic"
   domain        = local.domain
   env           = local.env
+  network       = local.network
+  boot_nodes    = local.boot_nodes
   region        = local.region
   vpc_index     = local.vpc_index
   web_zone_id   = data.aws_route53_zone.root.id

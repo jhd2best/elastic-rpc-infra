@@ -5,7 +5,7 @@ locals {
 resource "aws_elasticache_replication_group" "redis_shard" {
   for_each = { for obj in var.shard_conf : obj.shard_number => obj }
 
-  replication_group_id       = "${var.region}-${var.env}-S${each.key}-elastic-rpc"
+  replication_group_id       = "${var.region}-${var.env}-s${each.key}-elastic-rpc"
   description                = "elastic cluster for shard ${each.key}"
   node_type                  = each.value.redis_instance_type
   port                       = local.redis_port
@@ -17,6 +17,7 @@ resource "aws_elasticache_replication_group" "redis_shard" {
   data_tiering_enabled       = false
   automatic_failover_enabled = true
   multi_az_enabled           = true
+  subnet_group_name          = aws_elasticache_subnet_group.elastic_redis.name
   parameter_group_name       = aws_elasticache_parameter_group.elastic_redis.name
   security_group_ids         = [aws_security_group.elastic_redis.id]
 
@@ -34,13 +35,26 @@ resource "aws_elasticache_replication_group" "redis_shard" {
   }
 }
 
+resource "aws_elasticache_subnet_group" "elastic_redis" {
+  name       = "elastic-rpc-redis-${var.region}-${var.env}"
+  subnet_ids = aws_subnet.public.*.id
+}
+
 resource "aws_security_group" "elastic_redis" {
-  name = "elastic-rpc-redis-${var.region}-${var.env}"
+  vpc_id = aws_vpc.vpc.id
+  name   = "elastic-rpc-redis-${var.region}-${var.env}"
   ingress {
     protocol    = "tcp"
     from_port   = local.redis_port
     to_port     = local.redis_port
     cidr_blocks = aws_subnet.public.*.cidr_block
+  }
+
+  egress {
+    protocol    = "-1"
+    from_port   = 0
+    to_port     = 0
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 

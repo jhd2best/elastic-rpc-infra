@@ -1,5 +1,7 @@
 variable "region" {}
 variable "env" {}
+variable "network" {}
+variable "boot_nodes" {}
 variable "domain" {}
 variable "web_zone_id" {}
 variable "vpc_index" { default = 51 }

@@ -240,7 +240,7 @@ scrape_configs:
   - job_name: 'elastic_rpc'
     consul_sd_configs:
       - server: 'localhost:8500'
-        services: ['elastic-rpc-writer', 'elastic-rpc-reader']
+        services: ['erpc_reader_http']
         token: '{{ key "consul/tokens/prometheus" }}'
     metric_relabel_configs:
     - source_labels: [__name__]
@@ -248,13 +248,13 @@ scrape_configs:
       action: keep
     relabel_configs:
     - source_labels: [__meta_consul_tags]
-      regex: '.*,projectid=([^,]+),.*'
+      regex: '.*,type=([^,]+),.*'
       replacement: '$1'
-      target_label: 'projectid'
+      target_label: 'enode_type'
     - source_labels: [__meta_consul_tags]
-      regex: '.*,tier=([^,]+),.*'
+      regex: '.*,shard=([^,]+),.*'
       replacement: '$1'
-      target_label: 'tier'
+      target_label: 'shard'
     metrics_path: /metrics
 
 remote_write:
