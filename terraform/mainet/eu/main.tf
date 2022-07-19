@@ -8,9 +8,9 @@ terraform {
 
 
 locals {
-  region     = "eu" # change this if new region or env launched
+  region     = "eu"           # change this if new region or env launched
   aws_region = "eu-central-1" # change this if new region or env launched
-  env        = "mainet" # change this if new region or env launched
+  env        = "mainet"       # change this if new region or env launched
   domain     = "t.hmny.io"
   vpc_index  = 51
 }
@@ -64,6 +64,6 @@ module "elastic" {
 }
 
 output "elastic" {
-  value = module.elastic
+  value     = module.elastic
   sensitive = true
 }

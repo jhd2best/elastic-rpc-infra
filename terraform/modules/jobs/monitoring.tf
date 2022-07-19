@@ -10,8 +10,8 @@ resource "nomad_job" "prom_autoscaler" {
   for_each = { for g in try(var.nomad.cluster_groups, []) : g.id => g if g.id == "client" }
   jobspec = templatefile("${path.module}/jobs/prom_autoscaler.nomad", {
     # Prometheus
-    env           = var.env
-    region        = var.region
+    env    = var.env
+    region = var.region
     # Autoscaler
     client_asg_name           = var.nomad.autoscaling_groups[each.key].name
     client_node_class         = each.key
@@ -27,7 +27,7 @@ resource "nomad_job" "prom_autoscaler" {
 
 resource "nomad_job" "promtail" {
   jobspec = templatefile("${path.module}/jobs/promtail.nomad", {
-    env           = var.env
-    region        = var.region
+    env    = var.env
+    region = var.region
   })
 }
