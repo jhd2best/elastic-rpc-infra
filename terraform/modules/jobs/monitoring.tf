@@ -6,12 +6,11 @@ resource "nomad_job" "fabio" {
   jobspec = file("${path.module}/jobs/fabio.nomad")
 }
 
-resource "nomad_job" "prom_autoscaler_portal" {
+resource "nomad_job" "prom_autoscaler" {
   for_each = { for g in try(var.nomad.cluster_groups, []) : g.id => g if g.id == "client" }
   jobspec = templatefile("${path.module}/jobs/prom_autoscaler.nomad", {
     # Prometheus
     env           = var.env
-    nomad_cluster = "elastic_rpc"
     region        = var.region
     # Autoscaler
     client_asg_name           = var.nomad.autoscaling_groups[each.key].name
@@ -26,9 +25,9 @@ resource "nomad_job" "prom_autoscaler_portal" {
   })
 }
 
-#resource "nomad_job" "promtail_portal" {
-#  jobspec = templatefile("${path.module}/jobs/promtail.nomad", {
-#    env           = var.env
-#    nomad_cluster = "elastic_rpc"
-#  })
-#}
+resource "nomad_job" "promtail" {
+  jobspec = templatefile("${path.module}/jobs/promtail.nomad", {
+    env           = var.env
+    region        = var.region
+  })
+}

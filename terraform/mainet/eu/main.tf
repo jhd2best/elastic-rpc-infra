@@ -52,13 +52,13 @@ module "elastic" {
   shard_conf = [{
     shard_number                  = 0
     redis_shards                  = 3
-    redis_replicas_per_node_group = 2
+    redis_replicas_per_node_group = 1
     redis_instance_type           = "cache.r6g.large"
     },
     {
       shard_number                  = 1
       redis_shards                  = 3
-      redis_replicas_per_node_group = 2
+      redis_replicas_per_node_group = 1
       redis_instance_type           = "cache.r6g.large"
   }]
 }

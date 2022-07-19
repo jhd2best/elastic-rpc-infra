@@ -214,12 +214,11 @@ EOF
         data = <<EOH
 ---
 global:
-  scrape_interval: 15s
+  scrape_interval: 30s
   scrape_timeout:  5s
   external_labels:
-    nomad_cluster: ${nomad_cluster}
-    region : ${region}
     env : ${env}
+    region : ${region}
 
 scrape_configs:
   - job_name: 'prometheus'
@@ -235,7 +234,6 @@ scrape_configs:
       - source_labels: ['__meta_consul_tags']
         regex: '(.*)http(.*)'
         action: keep
-    scrape_interval: 5s
     metrics_path: /v1/metrics
     params:
       format: ['prometheus']
@@ -257,13 +255,12 @@ scrape_configs:
       regex: '.*,tier=([^,]+),.*'
       replacement: '$1'
       target_label: 'tier'
-    scrape_interval: 15s
     metrics_path: /metrics
 
 remote_write:
   - url: https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
     basic_auth:
-      username: 500382
+      username: {{ key "consul/params/grafana-user" }}
       password: {{ key "consul/tokens/grafana-publisher" }}
 EOH
       }

@@ -43,10 +43,10 @@ positions:
   filename: /data/promtail_positions.yaml
 
 client:
-  url: https://249161:{{ key "consul/tokens/grafana-publisher" }}@logs-prod3.grafana.net/loki/api/v1/push
+  url: https://{{ key "consul/params/loki-user" }}:{{ key "consul/tokens/grafana-publisher" }}@logs-prod3.grafana.net/loki/api/v1/push
   external_labels:
-    nomad_cluster: ${nomad_cluster}
     env : ${env}
+    region : ${region}
 
 server:
   http_listen_port: 0
@@ -57,15 +57,6 @@ scrape_configs:
   consul_sd_configs:
     - server: 'localhost:8500'
       token: '{{ key "consul/tokens/prometheus" }}'
-  pipeline_stages:
-  - match:
-      selector: '{job="replicator-rooms"}'
-      stages:
-      - regex:
-          expression: ".*project-id='(?P<projectid>[a-zA-Z0-9]+).*room-uid=(?P<roomid>[a-zA-Z0-9]+)"
-      - labels:
-          roomid:
-          projectid:
   relabel_configs:
     - source_labels: [__meta_consul_node]
       target_label: __host__
