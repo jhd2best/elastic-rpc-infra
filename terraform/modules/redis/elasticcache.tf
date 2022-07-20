@@ -37,7 +37,7 @@ resource "aws_elasticache_replication_group" "redis_shard" {
 
 resource "aws_elasticache_subnet_group" "elastic_redis" {
   name       = "elastic-rpc-redis-${var.region}-${var.env}"
-  subnet_ids = aws_subnet.public.*.id
+  subnet_ids = try(var.subnets.*.id, [])
 }
 
 resource "aws_security_group" "elastic_redis" {
@@ -47,7 +47,7 @@ resource "aws_security_group" "elastic_redis" {
     protocol    = "tcp"
     from_port   = local.redis_port
     to_port     = local.redis_port
-    cidr_blocks = aws_subnet.public.*.cidr_block
+    cidr_blocks = try(var.subnets.*.cidr_block, [])
   }
 
   egress {

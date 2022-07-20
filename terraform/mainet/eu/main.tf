@@ -2,7 +2,7 @@ terraform {
   backend "s3" {
     region = "us-west-2"
     bucket = "tf-harmony"
-    key    = "elastic-rpc/mainet/eu" # change this if new region or env launched
+    key    = "elastic-rpc/mainnet/eu" # change this if new region or env launched
   }
 }
 
@@ -10,8 +10,8 @@ terraform {
 locals {
   region     = "eu"                           # change this if new region or env launched
   aws_region = "eu-central-1"                 # change this if new region or env launched
-  env        = "mainet"                       # change this if new region or env launched
-  network    = "mainnet"                      # change this if new region or env launched
+  env        = "main"                         # change this if new region or env launched # this is used for namespacing so it can be a short version
+  network    = "mainnet"                      # change this if new region or env launched # this is used for node configuration
   boot_nodes = "/dnsaddr/bootstrap.t.hmny.io" # change this if new region or env launched
   domain     = "t.hmny.io"
   vpc_index  = 51

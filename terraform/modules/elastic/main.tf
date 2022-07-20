@@ -58,6 +58,18 @@ module "tkiv" {
   source = "../tkiv"
 }
 
+module "redis" {
+  source        = "../redis"
+  env           = var.env
+  redis_version = var.redis_version
+  region        = var.region
+  shard_conf    = var.shard_conf
+  subnets       = aws_subnet.public
+  vpc_id        = aws_vpc.vpc
+
+  depends_on = [aws_subnet.public]
+}
+
 module "jobs" {
   source     = "../../modules/jobs"
   env        = var.env
@@ -70,8 +82,10 @@ module "jobs" {
       shard_wss_endpoint  = "ws.s${bd.shard_number}.${local.domain}"
       shard_http_endpoint = "api.s${bd.shard_number}.${local.domain}"
       shard_number        = bd.shard_number
-      redis_addr          = "${aws_elasticache_replication_group.redis_shard[bd.shard_number].configuration_endpoint_address}:${local.redis_port}"
+      redis_addr          = "${module.redis.shard_addresses[bd.shard_number]}:${module.redis.shard_ports[bd.shard_number]}"
       tkiv_addr           = module.tkiv.tkiv_url
     }
   ]
+
+  depends_on = [module.redis]
 }
