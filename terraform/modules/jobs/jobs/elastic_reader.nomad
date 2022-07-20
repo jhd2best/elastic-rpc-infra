@@ -231,7 +231,7 @@ EOH
 
       service {
           name = "erpc-reader-metrics"
-          tags = ["erpc_reader", "enode_type=erpc_reader", "shard=${shard}"]
+          tags = ["erpc_reader", "enodetype=erpc_reader", "shard=${shard}"]
           port = "metrics"
           meta {
             port = "$${NOMAD_PORT_metrics}"
@@ -242,7 +242,7 @@ EOH
 
       service {
           name = "erpc-reader-s${shard}-http"
-          tags = ["erpc_reader", "urlprefix-${http_domain}/", "enode_type=erpc_reader", "shard=${shard}"]
+          tags = ["erpc_reader", "urlprefix-${http_domain}/", "enodetype=erpc_reader", "shard=${shard}"]
           port = "http_auth"
           check {
               type     = "http"
@@ -261,7 +261,7 @@ EOH
       %{~ for id, domain in http_domains  ~}
           service {
             name = "nolog-erpc-reader-s${shard}-http-${id}"
-            tags = ["erpc_reader", "urlprefix-${domain}/", "enode_type=erpc_reader", "shard=${shard}"]
+            tags = ["erpc_reader", "urlprefix-${domain}/", "enodetype=erpc_reader", "shard=${shard}"]
             port = "http_auth"
             check {
               type     = "http"
@@ -280,7 +280,7 @@ EOH
 
       service {
           name = "nolog-erpc-reader-s${shard}-wss"
-          tags = ["erpc_reader", "urlprefix-${wss_domain}/", "type=erpc_reader", "shard=${shard}"]
+          tags = ["erpc_reader", "urlprefix-${wss_domain}/", "enodetype=erpc_reader", "shard=${shard}"]
           port = "wss_auth"
 
           check {

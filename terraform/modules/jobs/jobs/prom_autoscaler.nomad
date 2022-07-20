@@ -221,22 +221,22 @@ global:
     region : ${region}
 
 scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets:
-        - 'localhost:9090'
-  - job_name: 'nomad'
-    consul_sd_configs:
-      - server: 'localhost:8500'
-        services: ['nomad-client', 'nomad']
-        token: '{{ key "consul/tokens/prometheus" }}'
-    relabel_configs:
-      - source_labels: ['__meta_consul_tags']
-        regex: '(.*)http(.*)'
-        action: keep
-    metrics_path: /v1/metrics
-    params:
-      format: ['prometheus']
+#  - job_name: 'prometheus'
+#    static_configs:
+#      - targets:
+#        - 'localhost:9090'
+#  - job_name: 'nomad'
+#    consul_sd_configs:
+#      - server: 'localhost:8500'
+#        services: ['nomad-client', 'nomad']
+#        token: '{{ key "consul/tokens/prometheus" }}'
+#    relabel_configs:
+#      - source_labels: ['__meta_consul_tags']
+#        regex: '(.*)http(.*)'
+#        action: keep
+#    metrics_path: /v1/metrics
+#    params:
+#      format: ['prometheus']
   - job_name: 'elastic_rpc_metrics'
     consul_sd_configs:
       - server: 'localhost:8500'
@@ -244,7 +244,7 @@ scrape_configs:
         token: '{{ key "consul/tokens/prometheus" }}'
     relabel_configs:
     - source_labels: [__meta_consul_tags]
-      regex: '.*,type=([^,]+),.*'
+      regex: '.*,enodetype=([^,]+),.*'
       replacement: '$1'
       target_label: 'enode_type'
     - source_labels: [__meta_consul_tags]
