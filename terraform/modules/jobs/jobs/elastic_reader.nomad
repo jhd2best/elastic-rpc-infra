@@ -85,7 +85,7 @@ job "erpc-reader-${shard}" {
       }
 
       env {
-        LOAD_PRE_FETCH = "yes"
+       # LOAD_PRE_FETCH = "yes"
       }
 
       artifact {
@@ -136,7 +136,7 @@ Version = "2.5.1"
   IsOffline = true
   NoStaking = true
   NodeType = "explorer"
-  ShardID = 0
+  ShardID = ${shard}
   RunElasticMode = true
 
 [TiKV]
@@ -234,6 +234,7 @@ EOH
           port = "http_auth"
           check {
               type     = "http"
+              port     = "http_auth"
               path     = "/metrics"
               interval = "15s"
               timeout  = "2s"
@@ -249,6 +250,14 @@ EOH
           name = "erpc-reader-wss"
           tags = ["erpc_reader", "urlprefix-${wss_domain}/", "type=erpc_reader", "shard=${shard}"]
           port = "wss_auth"
+
+          check {
+            type     = "http"
+            port     = "http_auth"
+            path     = "/metrics"
+            interval = "15s"
+            timeout  = "2s"
+          }
 
           meta {
             port = "$${NOMAD_PORT_wss_auth}"

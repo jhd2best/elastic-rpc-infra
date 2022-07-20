@@ -23,8 +23,31 @@ locals {
     }
   }
 
-  fabio_apps = merge({
-  }, var.fabio_apps)
+  fabio_shard = concat([], var.fabio_shard)
+
+  cluster_clients_shard = flatten([
+    for pk, shard in local.fabio_shard : [
+      for g in var.cluster_groups : {
+        shard_number = shard.shard_number
+        group        = g.id
+      } if g.id != "server"
+    ]
+  ])
+
+  other_domains_per_shard = {
+    for num, domains in
+    { for id, app in local.fabio_shard : app.shard_number => app.other_supported_domains... } :
+    num => flatten(domains)
+  }
+
+  other_domains_by_shard = flatten([
+    for num, domains in local.other_domains_per_shard : [
+      for domain in domains : {
+        domain       = domain
+        shard_number = num
+      }
+    ]
+  ])
 }
 
 resource "aws_lb_target_group" "app" {
@@ -59,9 +82,10 @@ resource "aws_autoscaling_attachment" "app" {
   lb_target_group_arn    = aws_lb_target_group.app[split("@", each.key)[0]].arn
 }
 
-resource "aws_lb_listener_rule" "app" {
+// This is for the global apps so we use the first loadbalancer in the list
+resource "aws_lb_listener_rule" "global_app" {
   for_each     = local.apps
-  listener_arn = aws_lb_listener.https.arn
+  listener_arn = aws_lb_listener.https[0].arn
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app[each.key].arn
@@ -73,14 +97,15 @@ resource "aws_lb_listener_rule" "app" {
   }
 }
 
-resource "aws_route53_record" "app" {
+// This is for the global apps so we use the first loadbalancer in the list
+resource "aws_route53_record" "global_app" {
   for_each = local.apps
   zone_id  = local.zone_id
   name     = "${each.key}.${local.domain}"
   type     = "A"
   alias {
-    zone_id                = aws_lb.lb.zone_id
-    name                   = aws_lb.lb.dns_name
+    zone_id                = aws_lb.lb[0].zone_id
+    name                   = aws_lb.lb[0].dns_name
     evaluate_target_health = false
   }
 }
@@ -89,7 +114,8 @@ resource "aws_route53_record" "app" {
 // used by fabio and exposed for the load balancer
 
 resource "aws_lb_target_group" "fabio_apps" {
-  name                 = "${var.cluster_id}-fabio-apps"
+  for_each             = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
+  name                 = "${var.cluster_id}-s${each.key}-fabio-apps"
   port                 = 9999
   protocol             = "HTTP"
   vpc_id               = local.vpc_id
@@ -108,7 +134,8 @@ resource "aws_lb_target_group" "fabio_apps" {
 }
 
 resource "aws_lb_target_group" "fabio_grpc" {
-  name                 = "${var.cluster_id}-fabio-grpc"
+  for_each             = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
+  name                 = "${var.cluster_id}-s${each.key}-fabio-grpc"
   port                 = 9997
   protocol             = "HTTP"
   protocol_version     = "GRPC"
@@ -129,80 +156,81 @@ resource "aws_lb_target_group" "fabio_grpc" {
 }
 
 resource "aws_autoscaling_attachment" "fabio_apps" {
-  for_each               = { for g in var.cluster_groups : g.id => g if g.id != "server" }
-  autoscaling_group_name = aws_autoscaling_group.group[each.key].id
-  lb_target_group_arn    = aws_lb_target_group.fabio_apps.arn
+  for_each               = { for g in local.cluster_clients_shard : "${g.shard_number}:${g.group}" => g... }
+  autoscaling_group_name = aws_autoscaling_group.group[each.value[0].group].id
+  lb_target_group_arn    = aws_lb_target_group.fabio_apps[each.value[0].shard_number].arn
 }
 
 resource "aws_autoscaling_attachment" "fabio_grpc" {
-  for_each               = { for g in var.cluster_groups : g.id => g if g.id != "server" }
-  autoscaling_group_name = aws_autoscaling_group.group[each.key].id
-  lb_target_group_arn    = aws_lb_target_group.fabio_grpc.arn
+  for_each               = { for g in local.cluster_clients_shard : "${g.shard_number}:${g.group}" => g... }
+  autoscaling_group_name = aws_autoscaling_group.group[each.value[0].group].id
+  lb_target_group_arn    = aws_lb_target_group.fabio_grpc[each.value[0].shard_number].arn
 }
 
-resource "aws_lb_listener_rule" "fabio_apps_subdomain" {
-  for_each     = { for id, app in local.fabio_apps : id => app if try(app.subdomain, "") != "" }
-  listener_arn = aws_lb_listener.https.arn
-  action {
-    type             = "forward"
-    target_group_arn = try(each.value.grpc, false) ? aws_lb_target_group.fabio_grpc.arn : aws_lb_target_group.fabio_apps.arn
-  }
-  condition {
-    host_header {
-      values = [try(each.value.subdomain, "") != "" ? "${each.value.subdomain}.${local.domain}" : local.domain]
-    }
-  }
-}
-
-// catch all apps at, e.g. example.com/myapp
+// catch all apps at, e.g. s0.example.com/myapp
 resource "aws_lb_listener_rule" "fabio_apps_root" {
-  listener_arn = aws_lb_listener.https.arn
+  for_each     = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
+  listener_arn = aws_lb_listener.https[each.key].arn
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.fabio_apps.arn
+    target_group_arn = aws_lb_target_group.fabio_apps[each.key].arn
   }
   condition {
     host_header {
-      values = [local.domain]
-    }
-  }
-}
-
-// additional subdomain to catch all aps, e.g. lb.example.com/myapp
-resource "aws_lb_listener_rule" "fabio_apps_lb" {
-  listener_arn = aws_lb_listener.https.arn
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.fabio_apps.arn
-  }
-  condition {
-    host_header {
-      values = ["lb.${local.domain}"]
+      values = ["s${each.key}.${local.domain}"]
     }
   }
 }
 
 resource "aws_route53_record" "fabio_apps_lb" {
-  zone_id = local.zone_id
-  name    = "lb.${local.domain}"
-  type    = "A"
-  alias {
-    zone_id                = aws_lb.lb.zone_id
-    name                   = aws_lb.lb.dns_name
-    evaluate_target_health = false
-  }
-}
-
-// create DNS record for all custom fabio app subdomains, e.g. myapp.example.com
-resource "aws_route53_record" "fabio_apps" {
-  for_each = { for id, app in local.fabio_apps : id => app if try(app.subdomain, "") != "" }
+  for_each = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
   zone_id  = local.zone_id
-  name     = "${each.key}.${local.domain}"
+  name     = "lb${each.key}.${local.domain}"
   type     = "A"
   alias {
-    zone_id                = aws_lb.lb.zone_id
-    name                   = aws_lb.lb.dns_name
+    zone_id                = aws_lb.lb[each.key].zone_id
+    name                   = aws_lb.lb[each.key].dns_name
     evaluate_target_health = false
   }
 }
 
+// create DNS record for all custom fabio shards subdomains, e.g. api.s0.example.com
+resource "aws_route53_record" "fabio_shard" {
+  for_each = { for id, app in local.fabio_shard : id => app }
+  zone_id  = local.zone_id
+  name     = "${each.value.subdomain}${each.value.shard_number}.${local.domain}"
+  type     = "A"
+  alias {
+    zone_id                = aws_lb.lb[each.value.shard_number].zone_id
+    name                   = aws_lb.lb[each.value.shard_number].dns_name
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_lb_listener_rule" "fabio_apps_subdomain" {
+  for_each     = { for id, app in local.fabio_shard : "${app.shard_number}:${app.subdomain}" => app }
+  listener_arn = aws_lb_listener.https[each.value.shard_number].arn
+  action {
+    type             = "forward"
+    target_group_arn = try(each.value.grpc, false) ? aws_lb_target_group.fabio_grpc[each.value.shard_number].arn : aws_lb_target_group.fabio_apps[each.value.shard_number].arn
+  }
+  condition {
+    host_header {
+      values = ["${each.value.subdomain}${each.value.shard_number}.${local.domain}"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "fabio_apps_other_domains" {
+  for_each     = { for app in local.other_domains_by_shard : "${app.shard_number}:${app.domain}" => app... }
+  listener_arn = aws_lb_listener.https[each.value[0].shard_number].arn
+  action {
+    type             = "forward"
+    target_group_arn = try(each.value[0].grpc, false) ? aws_lb_target_group.fabio_grpc[each.value[0].shard_number].arn : aws_lb_target_group.fabio_apps[each.value[0].shard_number].arn
+  }
+  condition {
+    host_header {
+      values = [each.value[0].domain]
+    }
+  }
+}

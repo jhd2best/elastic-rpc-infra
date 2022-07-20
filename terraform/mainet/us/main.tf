@@ -2,14 +2,14 @@ terraform {
   backend "s3" {
     region = "us-west-2"
     bucket = "tf-harmony"
-    key    = "elastic-rpc/mainnet/eu" # change this if new region or env launched
+    key    = "elastic-rpc/mainnet/us" # change this if new region or env launched
   }
 }
 
 
 locals {
-  region     = "eu"                           # change this if new region or env launched
-  aws_region = "eu-central-1"                 # change this if new region or env launched
+  region     = "us"                           # change this if new region or env launched
+  aws_region = "us-west-2"                    # change this if new region or env launched
   env        = "main"                         # change this if new region or env launched # this is used for namespacing so it can be a short version
   network    = "mainnet"                      # change this if new region or env launched # this is used for node configuration
   boot_nodes = "/dnsaddr/bootstrap.t.hmny.io" # change this if new region or env launched
@@ -21,8 +21,8 @@ provider "aws" {
   region = local.aws_region
   default_tags {
     tags = {
-      Environment = "Mainnet"       # change this if new region or env launched
-      Region      = "Eu Franfkfurt" # change this if new region or env launched
+      Environment = "Mainnet"   # change this if new region or env launched
+      Region      = "US Oregon" # change this if new region or env launched
       Owner       = "DevOps Guild"
       Project     = "elastic-rpc-infra"
     }
@@ -58,12 +58,32 @@ module "elastic" {
     redis_shards                  = 2
     redis_replicas_per_node_group = 1
     redis_instance_type           = "cache.r6g.large"
+    other_supported_domains_http = [
+      "api.harmony.one",
+      "curve.s0.t.hmny.io",
+      "sushi-archival.s0.t.hmny.io",
+      #"api.s0.t.hmny.io",
+      "rpc.s0.t.hmny.io",
+      "thegraph.s0.t.hmny.io",
+      "bridge.api.s0.t.hmny.io",
+      "rosetta.s0.t.hmny.io",
+      "btc.api.s0.t.hmny.io",
+      "ws.s0.t.hmny.io",
+      "partners.s0.t.hmny.io",
+    ]
+    other_supported_domains_wss = [
+      "wss.internal.s0.t.hmny.io",
+      "ws.internal.s0.t.hmny.io",
+      "ws.s0.t.hmny.io",
+    ]
     },
     {
       shard_number                  = 1
       redis_shards                  = 1
       redis_replicas_per_node_group = 1
       redis_instance_type           = "cache.r6g.large"
+      other_supported_domains_http  = ["api.s1.t.hmny.io"]
+      other_supported_domains_wss   = []
   }]
 }
 

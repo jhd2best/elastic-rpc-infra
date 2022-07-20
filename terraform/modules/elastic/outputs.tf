@@ -3,7 +3,7 @@ output "aws_region" {
 }
 
 output "vpc" {
-  value = aws_vpc.vpc
+  value = data.aws_vpc.vpc
 }
 
 output "nomad" {

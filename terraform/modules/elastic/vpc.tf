@@ -6,47 +6,57 @@ locals {
   zones = slice(data.aws_availability_zones.available.names, 0, min(3, length(data.aws_availability_zones.available.names)))
 }
 
-resource "aws_vpc" "vpc" {
-  cidr_block = "10.${var.vpc_index}.0.0/16"
-  tags = {
-    Name = "${var.env}-${local.project}"
-  }
+data "aws_vpc" "vpc" {
+  id = "vpc-cd3e33b4"
 }
 
-resource "aws_subnet" "public" {
-  count                   = length(local.zones)
-  cidr_block              = "10.${var.vpc_index}.${count.index * 16}.0/20"
-  availability_zone       = local.zones[count.index]
-  vpc_id                  = aws_vpc.vpc.id
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "${var.env}-${local.project}"
-  }
+data "aws_subnet" "public" {
+  count             = length(local.zones)
+  vpc_id            = "vpc-cd3e33b4"
+  availability_zone = local.zones[count.index]
 }
 
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.vpc.id
-  tags = {
-    Name = "${var.env}-${local.project}"
-  }
-}
+#resource "aws_vpc" "vpc" {
+#  cidr_block = "10.${var.vpc_index}.0.0/16"
+#  tags = {
+#    Name = "${var.env}-${local.project}"
+#  }
+#}
 
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.vpc.id
-  tags = {
-    Name = "${var.env}-${local.project}"
-  }
-}
-
-resource "aws_route_table_association" "public" {
-  count          = length(local.zones)
-  route_table_id = aws_route_table.public.id
-  subnet_id      = aws_subnet.public[count.index].id
-}
-
-resource "aws_route" "igw" {
-  route_table_id         = aws_route_table.public.id
-  gateway_id             = aws_internet_gateway.igw.id
-  destination_cidr_block = "0.0.0.0/0"
-}
+#resource "aws_subnet" "public" {
+#  count                   = length(local.zones)
+#  cidr_block              = "10.${var.vpc_index}.${count.index * 16}.0/20"
+#  availability_zone       = local.zones[count.index]
+#  vpc_id                  = data.aws_vpc.vpc.id
+#  map_public_ip_on_launch = true
+#
+#  tags = {
+#    Name = "${var.env}-${local.project}"
+#  }
+#}
+#
+#resource "aws_internet_gateway" "igw" {
+#  vpc_id = data.aws_vpc.vpc.id
+#  tags = {
+#    Name = "${var.env}-${local.project}"
+#  }
+#}
+#
+#resource "aws_route_table" "public" {
+#  vpc_id = data.aws_vpc.vpc.id
+#  tags = {
+#    Name = "${var.env}-${local.project}"
+#  }
+#}
+#
+#resource "aws_route_table_association" "public" {
+#  count          = length(local.zones)
+#  route_table_id = aws_route_table.public.id
+#  subnet_id      = aws_subnet.public[count.index].id
+#}
+#
+#resource "aws_route" "igw" {
+#  route_table_id         = aws_route_table.public.id
+#  gateway_id             = aws_internet_gateway.igw.id
+#  destination_cidr_block = "0.0.0.0/0"
+#}

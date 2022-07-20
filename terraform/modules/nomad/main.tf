@@ -23,6 +23,33 @@ locals {
   vpc_id                    = var.vpc.id
   subnet_ids                = var.public_subnet_ids
   default_security_group_id = data.aws_security_group.default.id
+
+  external_domains = [for domain in flatten([for app in local.fabio_shard : app.other_supported_domains]) : domain if split(var.rootDomain, domain)[0] == domain]
+  internal_domains = [for domain in flatten([for app in local.fabio_shard : app.other_supported_domains]) : domain if split(var.rootDomain, domain)[0] != domain]
+
+  external_cert_per_lb = flatten([
+    for pk, shard in local.fabio_shard : [
+      for nk, domain in local.external_domains : {
+        shard_number    = shard.shard_number
+        domain          = domain
+        listener_arn    = aws_lb_listener.https[shard.shard_number].arn
+        certificate_arn = data.aws_acm_certificate.external_certs[domain].arn
+      } if contains(shard.other_supported_domains, domain)
+    ]
+  ])
+
+  internal_cert_per_lb = flatten([
+    for pk, shard in local.fabio_shard : [
+      for domain in local.internal_domains : {
+        shard_number    = shard.shard_number
+        domain          = domain
+        listener_arn    = aws_lb_listener.https[shard.shard_number].arn
+        certificate_arn = data.aws_acm_certificate.internal_certs[domain].arn
+      } if contains(shard.other_supported_domains, domain)
+    ]
+  ])
+
+  #internal_dvo = flatten(aws_acm_certificate.internal_certs.*.domain_validation_options)
 }
 
 resource "null_resource" "wait_for_nomad" {

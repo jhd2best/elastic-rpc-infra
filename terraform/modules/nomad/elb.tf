@@ -29,7 +29,8 @@ resource "aws_security_group" "elb" {
 // the load balancer
 
 resource "aws_lb" "lb" {
-  name               = "${var.cluster_id}-elb"
+  for_each           = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
+  name               = "${var.cluster_id}-${each.key}-elb"
   load_balancer_type = "application"
   internal           = false
   security_groups    = [aws_security_group.elb.id, local.default_security_group_id]
@@ -39,7 +40,8 @@ resource "aws_lb" "lb" {
 // default listeners
 
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.lb.arn
+  for_each          = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
+  load_balancer_arn = aws_lb.lb[each.key].arn
   port              = "80"
   protocol          = "HTTP"
   default_action {
@@ -53,7 +55,8 @@ resource "aws_lb_listener" "http" {
 }
 
 resource "aws_lb_listener" "https" {
-  load_balancer_arn = aws_lb.lb.arn
+  for_each          = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
+  load_balancer_arn = aws_lb.lb[each.key].arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -66,4 +69,22 @@ resource "aws_lb_listener" "https" {
       status_code  = "200"
     }
   }
+}
+
+resource "aws_lb_listener_certificate" "external" {
+  for_each = { for idx, app in local.external_cert_per_lb : "${app.shard_number}:${app.domain}" => app... }
+
+  listener_arn    = each.value[0].listener_arn
+  certificate_arn = each.value[0].certificate_arn
+
+  depends_on = [data.aws_acm_certificate.external_certs, aws_lb_listener.https]
+}
+
+resource "aws_lb_listener_certificate" "internal" {
+  for_each = { for idx, app in local.internal_cert_per_lb : "${app.shard_number}:${app.domain}" => app... }
+
+  listener_arn    = each.value[0].listener_arn
+  certificate_arn = each.value[0].certificate_arn
+
+  depends_on = [data.aws_acm_certificate.internal_certs, aws_lb_listener.https]
 }

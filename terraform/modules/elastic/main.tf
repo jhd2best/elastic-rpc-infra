@@ -23,8 +23,9 @@ locals {
       ]
     }
   ]
-  project = "elastic-rpc"
-  domain  = "${var.region}.${var.env}.${var.domain}"
+  project    = "elastic-rpc"
+  domain     = "${var.region}.${var.env}.${var.domain}"
+  rootDomain = var.domain
 }
 
 data "aws_key_pair" "harmony" {
@@ -37,21 +38,32 @@ module "nomad" {
   consul_version = "1.12.3"
   region         = var.region
   domain         = local.domain
+  rootDomain     = local.rootDomain
   env            = var.env
   project        = "erpc-${var.env}-${var.region}"
   cluster_id     = "erpc-${var.env}-${var.region}"
   ssh_key_name   = data.aws_key_pair.harmony.key_name
   zone_id        = var.web_zone_id
-  vpc            = aws_vpc.vpc
+  vpc            = data.aws_vpc.vpc
   cluster_groups = local.groups
-  fabio_apps = merge({ # custom apps
-    # example = { subdomain = "example" },
-    }, { # websocket shards
-    for k, bd in var.shard_conf : "ws.s${bd.shard_number}" => { subdomain = "ws.s${bd.shard_number}" }
-    }, { # http shards
-    for k, bd in var.shard_conf : "api.s${bd.shard_number}" => { subdomain = "api.s${bd.shard_number}" }
-  })
-  public_subnet_ids = aws_subnet.public.*.id
+  fabio_shard = concat([], [ # websocket shards
+    for k, bd in var.shard_conf :
+    {
+      shard_number            = bd.shard_number
+      subdomain               = "ws"
+      other_supported_domains = bd.other_supported_domains_wss
+      grpc                    = false
+    }
+    ], [ # http shards
+    for k, bd in var.shard_conf :
+    {
+      shard_number            = bd.shard_number
+      subdomain               = "api"
+      other_supported_domains = bd.other_supported_domains_http
+      grpc                    = false
+    }
+  ])
+  public_subnet_ids = data.aws_subnet.public.*.id
 }
 
 module "tkiv" {
@@ -64,10 +76,10 @@ module "redis" {
   redis_version = var.redis_version
   region        = var.region
   shard_conf    = var.shard_conf
-  subnets       = aws_subnet.public
-  vpc_id        = aws_vpc.vpc
+  subnets       = data.aws_subnet.public
+  vpc_id        = data.aws_vpc.vpc.id
 
-  depends_on = [aws_subnet.public]
+  depends_on = [data.aws_subnet.public]
 }
 
 module "jobs" {

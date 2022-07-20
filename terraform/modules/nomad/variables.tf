@@ -22,11 +22,14 @@ variable "cluster_groups" {
   description = "Describe the client/server instances in the cluster"
 }
 
-variable "fabio_apps" {
-  default = {
-    // subdomain = "sub" OR path = "path"
-    // grpc = true/false
-  }
+variable "fabio_shard" {
+  type = list(object({
+    shard_number            = number
+    subdomain               = string
+    grpc                    = bool
+    other_supported_domains = list(string)
+  }))
+
   description = "Register all the apps that are going to be hosted on the cluster"
 }
 
@@ -39,7 +42,11 @@ variable "region" {
 }
 
 variable "domain" {
-  description = "Root domain for the backend, e.g. hm.t.io"
+  description = "Domain or subdomain for the backend, e.g. example.hm.t.io"
+}
+
+variable "rootDomain" {
+  description = "Root for the backend, e.g. hm.t.io"
 }
 
 variable "project" {
