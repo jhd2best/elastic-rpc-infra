@@ -222,10 +222,22 @@ Version = "2.5.1"
   Port = {{ env "NOMAD_PORT_wss" }}
 
 [Prometheus]
+  Enabled = true
   Port = {{ env "NOMAD_PORT_metrics" }}
   EnablePush = false
   IP = "0.0.0.0"
 EOH
+      }
+
+      service {
+          name = "erpc-reader-metrics"
+          tags = ["erpc_reader", "enode_type=erpc_reader", "shard=${shard}"]
+          port = "metrics"
+          meta {
+            port = "$${NOMAD_PORT_metrics}"
+            public_ip = "$${attr.unique.platform.aws.public-ipv4}"
+            private_ip = "$${attr.unique.platform.aws.local-ipv4}"
+          }
       }
 
       service {

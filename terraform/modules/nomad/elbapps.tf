@@ -182,14 +182,27 @@ resource "aws_lb_listener_rule" "fabio_apps_root" {
   }
 }
 
+// additional subdomain to catch all aps, e.g. lb.example.com/myapp
+resource "aws_lb_listener_rule" "fabio_apps_lb" {
+  listener_arn = aws_lb_listener.https[0].arn
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.fabio_apps[0].arn
+  }
+  condition {
+    host_header {
+      values = ["lb.${local.domain}"]
+    }
+  }
+}
+
 resource "aws_route53_record" "fabio_apps_lb" {
-  for_each = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
   zone_id  = local.zone_id
-  name     = "lb${each.key}.${local.domain}"
+  name     = "lb.${local.domain}"
   type     = "A"
   alias {
-    zone_id                = aws_lb.lb[each.key].zone_id
-    name                   = aws_lb.lb[each.key].dns_name
+    zone_id                = aws_lb.lb[0].zone_id
+    name                   = aws_lb.lb[0].dns_name
     evaluate_target_health = false
   }
 }

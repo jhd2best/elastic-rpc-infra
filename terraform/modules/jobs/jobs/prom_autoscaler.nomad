@@ -240,7 +240,7 @@ scrape_configs:
   - job_name: 'elastic_rpc_metrics'
     consul_sd_configs:
       - server: 'localhost:8500'
-        services: ['erpc_reader_http']
+        services: ['erpc-reader-metrics']
         token: '{{ key "consul/tokens/prometheus" }}'
     relabel_configs:
     - source_labels: [__meta_consul_tags]
@@ -255,7 +255,7 @@ scrape_configs:
   - job_name: 'elastic_rpc_metrics_eth'
     consul_sd_configs:
       - server: 'localhost:8500'
-        services: ['erpc_reader_http']
+        services: ['erpc-reader-metrics']
         token: '{{ key "consul/tokens/prometheus" }}'
     relabel_configs:
     - source_labels: [__meta_consul_tags]
