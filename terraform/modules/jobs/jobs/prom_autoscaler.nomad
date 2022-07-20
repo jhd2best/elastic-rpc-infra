@@ -237,15 +237,11 @@ scrape_configs:
     metrics_path: /v1/metrics
     params:
       format: ['prometheus']
-  - job_name: 'elastic_rpc'
+  - job_name: 'elastic_rpc_metrics'
     consul_sd_configs:
       - server: 'localhost:8500'
         services: ['erpc_reader_http']
         token: '{{ key "consul/tokens/prometheus" }}'
-    metric_relabel_configs:
-    - source_labels: [__name__]
-      regex: node_network_transmit_bytes_total|node_network_receive_bytes_total|node_time_seconds
-      action: keep
     relabel_configs:
     - source_labels: [__meta_consul_tags]
       regex: '.*,type=([^,]+),.*'
@@ -256,11 +252,26 @@ scrape_configs:
       replacement: '$1'
       target_label: 'shard'
     metrics_path: /metrics
+  - job_name: 'elastic_rpc_metrics_eth'
+    consul_sd_configs:
+      - server: 'localhost:8500'
+        services: ['erpc_reader_http']
+        token: '{{ key "consul/tokens/prometheus" }}'
+    relabel_configs:
+    - source_labels: [__meta_consul_tags]
+      regex: '.*,type=([^,]+),.*'
+      replacement: '$1'
+      target_label: 'enode_type'
+    - source_labels: [__meta_consul_tags]
+      regex: '.*,shard=([^,]+),.*'
+      replacement: '$1'
+      target_label: 'shard'
+    metrics_path: /metrics/eth
 
 remote_write:
   - url: https://prometheus-prod-10-prod-us-central-0.grafana.net/api/prom/push
     basic_auth:
-      username: {{ key "consul/params/grafana-user" }}
+      username: {{ key "consul/users/grafana" }}
       password: {{ key "consul/tokens/grafana-publisher" }}
 EOH
       }

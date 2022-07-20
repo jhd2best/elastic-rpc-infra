@@ -30,11 +30,13 @@ variable "low_memory_target" {
 
 variable "shard_config" {
   type = list(object({
-    shard_number        = number
-    shard_http_endpoint = string
-    shard_wss_endpoint  = string
-    redis_addr          = string
-    tkiv_addr           = string
+    shard_number                 = number
+    shard_http_endpoint          = string
+    shard_wss_endpoint           = string
+    redis_addr                   = string
+    tkiv_addr                    = string
+    other_supported_domains_http = list(string)
+    other_supported_domains_wss  = list(string)
   }))
 
   default = []

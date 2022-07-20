@@ -43,7 +43,7 @@ positions:
   filename: /data/promtail_positions.yaml
 
 client:
-  url: https://{{ key "consul/params/loki-user" }}:{{ key "consul/tokens/grafana-publisher" }}@logs-prod3.grafana.net/loki/api/v1/push
+  url: https://{{ key "consul/users/loki" }}:{{ key "consul/tokens/grafana-publisher" }}@logs-prod3.grafana.net/loki/api/v1/push
   external_labels:
     env : ${env}
     region : ${region}
@@ -57,6 +57,11 @@ scrape_configs:
   consul_sd_configs:
     - server: 'localhost:8500'
       token: '{{ key "consul/tokens/prometheus" }}'
+  pipeline_stages:
+  - match:
+      # drop anything that has nolog as starting name
+      selector: '{job=~"nolog.+"}'
+      action: drop
   relabel_configs:
     - source_labels: [__meta_consul_node]
       target_label: __host__

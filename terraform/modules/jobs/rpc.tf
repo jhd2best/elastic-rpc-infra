@@ -12,6 +12,8 @@ resource "nomad_job" "elastic_reader" {
     boot_nodes   = var.boot_nodes
     network_type = var.network
     http_domain  = each.value.shard_http_endpoint
+    http_domains = each.value.other_supported_domains_http
     wss_domain   = each.value.shard_wss_endpoint
+    wss_domains  = each.value.other_supported_domains_wss
   })
 }

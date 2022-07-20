@@ -68,7 +68,6 @@ module "elastic" {
       "bridge.api.s0.t.hmny.io",
       "rosetta.s0.t.hmny.io",
       "btc.api.s0.t.hmny.io",
-      "ws.s0.t.hmny.io",
       "partners.s0.t.hmny.io",
     ]
     other_supported_domains_wss = [

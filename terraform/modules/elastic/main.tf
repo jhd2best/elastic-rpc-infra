@@ -91,11 +91,13 @@ module "jobs" {
   boot_nodes = var.boot_nodes
   shard_config = [
     for k, bd in var.shard_conf : {
-      shard_wss_endpoint  = "ws.s${bd.shard_number}.${local.domain}"
-      shard_http_endpoint = "api.s${bd.shard_number}.${local.domain}"
-      shard_number        = bd.shard_number
-      redis_addr          = "${module.redis.shard_addresses[bd.shard_number]}:${module.redis.shard_ports[bd.shard_number]}"
-      tkiv_addr           = module.tkiv.tkiv_url
+      shard_wss_endpoint           = "ws${bd.shard_number}.${local.domain}"
+      shard_http_endpoint          = "api${bd.shard_number}.${local.domain}"
+      shard_number                 = bd.shard_number
+      redis_addr                   = "${module.redis.shard_addresses[bd.shard_number]}:${module.redis.shard_ports[bd.shard_number]}"
+      tkiv_addr                    = module.tkiv.tkiv_url
+      other_supported_domains_http = bd.other_supported_domains_http
+      other_supported_domains_wss  = bd.other_supported_domains_wss
     }
   ]
 

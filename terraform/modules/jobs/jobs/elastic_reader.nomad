@@ -229,7 +229,7 @@ EOH
       }
 
       service {
-          name = "erpc-reader-http"
+          name = "erpc-reader-s${shard}-http"
           tags = ["erpc_reader", "urlprefix-${http_domain}/", "enode_type=erpc_reader", "shard=${shard}"]
           port = "http_auth"
           check {
@@ -246,8 +246,28 @@ EOH
           }
       }
 
+      %{~ for id, domain in http_domains  ~}
+          service {
+            name = "nolog-erpc-reader-s${shard}-http-${id}"
+            tags = ["erpc_reader", "urlprefix-${domain}/", "enode_type=erpc_reader", "shard=${shard}"]
+            port = "http_auth"
+            check {
+              type     = "http"
+              port     = "http_auth"
+              path     = "/metrics"
+              interval = "15s"
+              timeout  = "2s"
+            }
+            meta {
+              port = "$${NOMAD_PORT_http_auth}"
+              public_ip = "$${attr.unique.platform.aws.public-ipv4}"
+              private_ip = "$${attr.unique.platform.aws.local-ipv4}"
+            }
+          }
+        %{~ endfor ~}
+
       service {
-          name = "erpc-reader-wss"
+          name = "nolog-erpc-reader-s${shard}-wss"
           tags = ["erpc_reader", "urlprefix-${wss_domain}/", "type=erpc_reader", "shard=${shard}"]
           port = "wss_auth"
 
@@ -265,6 +285,26 @@ EOH
             private_ip = "$${attr.unique.platform.aws.local-ipv4}"
           }
       }
+
+      %{~ for id, domain in wss_domains  ~}
+        service {
+          name = "nolog-erpc-reader-s${shard}-wss-${id}"
+          tags = ["erpc_reader", "urlprefix-${domain}/", "enode_type=erpc_reader", "shard=${shard}"]
+          port = "wss_auth"
+          check {
+            type     = "http"
+            port     = "http_auth"
+            path     = "/metrics"
+            interval = "15s"
+            timeout  = "2s"
+          }
+          meta {
+            port = "$${NOMAD_PORT_http_auth}"
+            public_ip = "$${attr.unique.platform.aws.public-ipv4}"
+            private_ip = "$${attr.unique.platform.aws.local-ipv4}"
+          }
+        }
+      %{~ endfor ~}
     }
   }
 }
