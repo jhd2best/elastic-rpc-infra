@@ -246,7 +246,7 @@ scrape_configs:
     - source_labels: [__meta_consul_tags]
       regex: '.*,enodetype=([^,]+),.*'
       replacement: '$1'
-      target_label: 'enode_type'
+      target_label: 'erpc_type'
     - source_labels: [__meta_consul_tags]
       regex: '.*,shard=([^,]+),.*'
       replacement: '$1'

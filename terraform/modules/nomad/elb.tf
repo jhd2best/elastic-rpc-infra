@@ -30,7 +30,7 @@ resource "aws_security_group" "elb" {
 
 resource "aws_lb" "lb" {
   for_each           = { for id, app in local.fabio_shard : app.shard_number => app.shard_number... }
-  name               = "${var.cluster_id}-${each.key}-elb"
+  name               = "${var.cluster_id}-s${each.key}-elb"
   load_balancer_type = "application"
   internal           = false
   security_groups    = [aws_security_group.elb.id, local.default_security_group_id]
