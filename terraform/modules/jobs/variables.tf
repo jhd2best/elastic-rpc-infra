@@ -4,6 +4,9 @@ variable "region" {}
 variable "nomad" {}
 
 variable "boot_nodes" {}
+variable "dns_init_port" {}
+variable "p2p_init_port" {}
+variable "explorer_init_port" {}
 
 variable "high_cpu_target" {
   description = "High CPU % threshold for the cluster autoscaling"

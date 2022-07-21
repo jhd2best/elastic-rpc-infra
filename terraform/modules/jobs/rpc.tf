@@ -17,3 +17,18 @@ resource "nomad_job" "elastic_reader" {
     wss_domains  = each.value.other_supported_domains_wss
   })
 }
+
+resource "nomad_job" "elastic_writer" {
+  for_each = { for g in try(var.shard_config, []) : g.shard_number => g }
+  jobspec = templatefile("${path.module}/jobs/elastic_writer.nomad", {
+    shard              = each.key
+    binary_path        = local.harmony_binary_path
+    tkiv_addr          = each.value.tkiv_addr
+    redis_addr         = each.value.redis_addr
+    boot_nodes         = var.boot_nodes
+    network_type       = var.network
+    dns_port           = var.dns_init_port + each.key
+    p2p_port           = var.p2p_init_port + each.key
+    explorer_init_port = var.explorer_init_port + each.key
+  })
+}

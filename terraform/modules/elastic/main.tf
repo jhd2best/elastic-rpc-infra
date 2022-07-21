@@ -7,6 +7,10 @@ terraform {
 }
 
 locals {
+  maxShards        = 8
+  dnsInitPort      = 6000
+  p2pInitPort      = 9000
+  explorerInitPort = 5000
   groups = [
     {
       id              = "server"
@@ -18,8 +22,11 @@ locals {
       id             = "client"
       instance_type  = var.instance_type
       instance_count = { min : 0, max : 15, desired : 2 },
-      security_groups = [                                 # this groups are open to the whole world so used them with caution
-        { protocol : "icmp", from_port : 8, to_port : 0 } # enough to enable ping
+      security_groups = [                                                                                             # this groups are open to the whole world so used them with caution
+        { protocol : "icmp", from_port : 8, to_port : 0 },                                                            # enough to enable ping
+        { protocol : "tcp", from_port : local.dnsInitPort, to_port : local.dnsInitPort + local.maxShards },           # open ports for upto 8 shards
+        { protocol : "tcp", from_port : local.p2pInitPort, to_port : local.p2pInitPort + local.maxShards },           # open ports for upto 8 shards
+        { protocol : "tcp", from_port : local.explorerInitPort, to_port : local.explorerInitPort + local.maxShards }, # open ports for upto 8 shards
       ]
     }
   ]
@@ -101,5 +108,8 @@ module "jobs" {
     }
   ]
 
-  depends_on = [module.redis]
+  depends_on         = [module.redis]
+  dns_init_port      = local.dnsInitPort
+  p2p_init_port      = local.p2pInitPort
+  explorer_init_port = local.explorerInitPort
 }

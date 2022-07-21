@@ -74,7 +74,7 @@ EOF
         data = <<EOF
 scaling "memory_low" {
   enabled = true
-  min     = 1
+  min     = 2
   max     = ${client_max_nodes}
 
   policy {
@@ -107,7 +107,7 @@ scaling "memory_low" {
 
 scaling "cpu_low" {
   enabled = true
-  min     = 1
+  min     = 2
   max     = ${client_max_nodes}
 
   policy {
@@ -140,7 +140,7 @@ scaling "cpu_low" {
 
 scaling "metrics_high" {
   enabled = true
-  min     = 1
+  min     = 2
   max     = ${client_max_nodes}
 
   policy {
@@ -225,22 +225,22 @@ scrape_configs:
 #    static_configs:
 #      - targets:
 #        - 'localhost:9090'
-#  - job_name: 'nomad'
-#    consul_sd_configs:
-#      - server: 'localhost:8500'
-#        services: ['nomad-client', 'nomad']
-#        token: '{{ key "consul/tokens/prometheus" }}'
-#    relabel_configs:
-#      - source_labels: ['__meta_consul_tags']
-#        regex: '(.*)http(.*)'
-#        action: keep
-#    metrics_path: /v1/metrics
-#    params:
-#      format: ['prometheus']
+  - job_name: 'nomad'
+    consul_sd_configs:
+      - server: 'localhost:8500'
+        services: ['nomad-client', 'nomad']
+        token: '{{ key "consul/tokens/prometheus" }}'
+    relabel_configs:
+      - source_labels: ['__meta_consul_tags']
+        regex: '(.*)http(.*)'
+        action: keep
+    metrics_path: /v1/metrics
+    params:
+      format: ['prometheus']
   - job_name: 'elastic_rpc_metrics'
     consul_sd_configs:
       - server: 'localhost:8500'
-        services: ['erpc-reader-metrics']
+        services: ['nolog-erpc-reader-metrics', 'nolog-erpc-writer-metrics']
         token: '{{ key "consul/tokens/prometheus" }}'
     relabel_configs:
     - source_labels: [__meta_consul_tags]
@@ -255,11 +255,11 @@ scrape_configs:
   - job_name: 'elastic_rpc_metrics_eth'
     consul_sd_configs:
       - server: 'localhost:8500'
-        services: ['erpc-reader-metrics']
+        services: ['nolog-erpc-reader-metrics', 'nolog-erpc-writer-metrics']
         token: '{{ key "consul/tokens/prometheus" }}'
     relabel_configs:
     - source_labels: [__meta_consul_tags]
-      regex: '.*,type=([^,]+),.*'
+      regex: '.*,enodetype=([^,]+),.*'
       replacement: '$1'
       target_label: 'enode_type'
     - source_labels: [__meta_consul_tags]
@@ -277,8 +277,8 @@ EOH
       }
 
       resources {
-        cpu    = 500
-        memory = 500
+        cpu    = 200
+        memory = 200
       }
 
       driver = "exec"

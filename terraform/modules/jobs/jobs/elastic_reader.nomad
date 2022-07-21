@@ -4,7 +4,7 @@ job "erpc-reader-${shard}" {
   group "erpc-reader-${shard}" {
     scaling {
       min = 1
-      max = 20
+      max = 30
       enabled = true
 
       policy {
@@ -95,7 +95,7 @@ job "erpc-reader-${shard}" {
       }
 
       resources {
-        cpu = 5000
+        cpu = 6000
         memory = 4000
         memory_max = 5000
       }
@@ -230,8 +230,8 @@ EOH
       }
 
       service {
-          name = "erpc-reader-metrics"
-          tags = ["erpc_reader", "enodetype=erpc_reader", "shard=${shard}"]
+          name = "nolog-erpc-reader-metrics"
+          tags = ["erpc_reader", "enodetype=reader", "shard=${shard}"]
           port = "metrics"
           meta {
             port = "$${NOMAD_PORT_metrics}"
@@ -242,7 +242,7 @@ EOH
 
       service {
           name = "erpc-reader-s${shard}-http"
-          tags = ["erpc_reader", "urlprefix-${http_domain}/", "enodetype=erpc_reader", "shard=${shard}"]
+          tags = ["erpc_reader", "urlprefix-${http_domain}/", "enodetype=reader", "shard=${shard}"]
           port = "http_auth"
           check {
               type     = "http"
@@ -261,7 +261,7 @@ EOH
       %{~ for id, domain in http_domains  ~}
           service {
             name = "nolog-erpc-reader-s${shard}-http-${id}"
-            tags = ["erpc_reader", "urlprefix-${domain}/", "enodetype=erpc_reader", "shard=${shard}"]
+            tags = ["erpc_reader", "urlprefix-${domain}/", "enodetype=reader", "shard=${shard}"]
             port = "http_auth"
             check {
               type     = "http"
@@ -280,7 +280,7 @@ EOH
 
       service {
           name = "nolog-erpc-reader-s${shard}-wss"
-          tags = ["erpc_reader", "urlprefix-${wss_domain}/", "enodetype=erpc_reader", "shard=${shard}"]
+          tags = ["erpc_reader", "urlprefix-${wss_domain}/", "enodetype=reader", "shard=${shard}"]
           port = "wss_auth"
 
           check {
@@ -301,7 +301,7 @@ EOH
       %{~ for id, domain in wss_domains  ~}
         service {
           name = "nolog-erpc-reader-s${shard}-wss-${id}"
-          tags = ["erpc_reader", "urlprefix-${domain}/", "enode_type=erpc_reader", "shard=${shard}"]
+          tags = ["erpc_reader", "urlprefix-${domain}/", "enode_type=reader", "shard=${shard}"]
           port = "wss_auth"
           check {
             type     = "http"

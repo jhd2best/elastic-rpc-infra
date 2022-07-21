@@ -29,7 +29,7 @@ job "promtail" {
       user = "promtail_user"
 
       resources {
-        cpu    = 80
+        cpu    = 120
         memory = 80
       }
 

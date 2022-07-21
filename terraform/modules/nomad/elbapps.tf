@@ -197,9 +197,9 @@ resource "aws_lb_listener_rule" "fabio_apps_lb" {
 }
 
 resource "aws_route53_record" "fabio_apps_lb" {
-  zone_id  = local.zone_id
-  name     = "lb.${local.domain}"
-  type     = "A"
+  zone_id = local.zone_id
+  name    = "lb.${local.domain}"
+  type    = "A"
   alias {
     zone_id                = aws_lb.lb[0].zone_id
     name                   = aws_lb.lb[0].dns_name
