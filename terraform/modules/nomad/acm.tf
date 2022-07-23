@@ -65,10 +65,14 @@ resource "aws_route53_record" "validate_internal" {
   ttl             = 60
   type            = local.internal_dvo[count.index].resource_record_type
   zone_id         = local.zone_id
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
 resource "aws_acm_certificate_validation" "validate_internal" {
   for_each                = toset(local.internal_domains)
   certificate_arn         = aws_acm_certificate.internal_certs[each.key].arn
-  validation_record_fqdns = [for record in aws_route53_record.validate_internal : record.fqdn]
+  validation_record_fqdns = [for record in aws_route53_record.validate_internal : record.fqdn if split(each.key, record.fqdn)[0] != record.fqdn]
 }
