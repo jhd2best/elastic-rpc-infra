@@ -51,7 +51,7 @@ module "nomad" {
   cluster_id     = "erpc-${var.env}-${var.region}"
   ssh_key_name   = data.aws_key_pair.harmony.key_name
   zone_id        = var.web_zone_id
-  vpc            = data.aws_vpc.vpc
+  vpc            = aws_vpc.vpc
   cluster_groups = local.groups
   fabio_shard = concat([], [ # websocket shards
     for k, bd in var.shard_conf :
@@ -70,14 +70,14 @@ module "nomad" {
       grpc                    = false
     }
   ])
-  public_subnet_ids = data.aws_subnet.public.*.id
+  public_subnet_ids = aws_subnet.public.*.id
 }
 
 module "tkiv" {
   source     = "../tkiv"
   domain     = local.domain
-  subnet_ids = data.aws_subnet.public.*.id
-  vpc        = data.aws_vpc.vpc
+  subnet_ids = aws_subnet.public.*.id
+  vpc        = aws_vpc.vpc
 }
 
 module "redis" {
@@ -86,10 +86,10 @@ module "redis" {
   redis_version = var.redis_version
   region        = var.region
   shard_conf    = var.shard_conf
-  subnets       = data.aws_subnet.public
-  vpc_id        = data.aws_vpc.vpc.id
+  subnets       = aws_subnet.public
+  vpc_id        = aws_vpc.vpc.id
 
-  depends_on = [data.aws_subnet.public]
+  depends_on = [aws_subnet.public]
 }
 
 module "jobs" {

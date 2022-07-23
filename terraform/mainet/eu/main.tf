@@ -58,12 +58,16 @@ module "elastic" {
     redis_shards                  = 2
     redis_replicas_per_node_group = 1
     redis_instance_type           = "cache.r6g.large"
+    other_supported_domains_http  = []
+    other_supported_domains_wss   = []
     },
     {
       shard_number                  = 1
       redis_shards                  = 1
       redis_replicas_per_node_group = 1
       redis_instance_type           = "cache.r6g.large"
+      other_supported_domains_http  = []
+      other_supported_domains_wss   = []
   }]
 }
 

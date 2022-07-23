@@ -72,6 +72,8 @@ resource "aws_launch_configuration" "group" {
   }
 }
 
+data "aws_default_tags" "elastic" {}
+
 resource "aws_autoscaling_group" "group" {
   for_each             = { for g in var.cluster_groups : g.id => g }
   name                 = "${var.cluster_id}-nomad-${each.key}"
@@ -88,6 +90,16 @@ resource "aws_autoscaling_group" "group" {
     value               = "${var.cluster_id}-${each.value.id}"
     propagate_at_launch = true
   }
+
+  dynamic "tag" {
+    for_each = data.aws_default_tags.elastic.tags
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
+  }
+
   lifecycle {
     ignore_changes        = [desired_capacity, load_balancers, target_group_arns]
     create_before_destroy = true
