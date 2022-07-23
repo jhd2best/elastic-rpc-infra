@@ -1,5 +1,5 @@
 locals {
-  harmony_binary_path = "elastic_rpc_cluster/bin/harmony"
+  harmony_binary_path = "elastic_rpc_cluster/bin/harmony-writer-fix-stucked"
 }
 
 resource "nomad_job" "elastic_reader" {
@@ -7,7 +7,7 @@ resource "nomad_job" "elastic_reader" {
   jobspec = templatefile("${path.module}/jobs/elastic_reader.nomad", {
     shard        = each.key
     binary_path  = local.harmony_binary_path
-    tkiv_addr    = each.value.tkiv_addr
+    tkiv_addr    = "[\"${join("\", \"", each.value.tkiv_pd_addrs)}\"]"
     redis_addr   = each.value.redis_addr
     boot_nodes   = var.boot_nodes
     network_type = var.network
@@ -23,7 +23,7 @@ resource "nomad_job" "elastic_writer" {
   jobspec = templatefile("${path.module}/jobs/elastic_writer.nomad", {
     shard              = each.key
     binary_path        = local.harmony_binary_path
-    tkiv_addr          = each.value.tkiv_addr
+    tkiv_addr          = "[\"${join("\", \"", each.value.tkiv_pd_addrs)}\"]"
     redis_addr         = each.value.redis_addr
     boot_nodes         = var.boot_nodes
     network_type       = var.network

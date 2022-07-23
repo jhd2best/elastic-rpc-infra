@@ -37,7 +37,7 @@ variable "shard_config" {
     shard_http_endpoint          = string
     shard_wss_endpoint           = string
     redis_addr                   = string
-    tkiv_addr                    = string
+    tkiv_pd_addrs                = list(string)
     other_supported_domains_http = list(string)
     other_supported_domains_wss  = list(string)
   }))

@@ -74,7 +74,7 @@ EOF
         data = <<EOF
 scaling "memory_low" {
   enabled = true
-  min     = 2
+  min     = ${client_min_nodes}
   max     = ${client_max_nodes}
 
   policy {
@@ -107,7 +107,7 @@ scaling "memory_low" {
 
 scaling "cpu_low" {
   enabled = true
-  min     = 2
+  min     = ${client_min_nodes}
   max     = ${client_max_nodes}
 
   policy {
@@ -140,7 +140,7 @@ scaling "cpu_low" {
 
 scaling "metrics_high" {
   enabled = true
-  min     = 2
+  min     = ${client_min_nodes}
   max     = ${client_max_nodes}
 
   policy {

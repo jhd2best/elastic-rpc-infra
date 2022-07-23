@@ -141,7 +141,7 @@ Version = "2.5.1"
 
 [TiKV]
   Debug = false
-  PDAddr = ["${tkiv_addr}"]
+  PDAddr = ${tkiv_addr}
   Role = "Reader"
   StateDBCacheSizeInMB = 1024
   StateDBCachePersistencePath = "local/fastcache"

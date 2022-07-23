@@ -78,7 +78,7 @@ Version = "2.5.1"
   EnablePruneBeaconChain = false
   IsArchival = true
   IsBackup = false
-  IsBeaconArchival = true
+  IsBeaconArchival = false
   IsOffline = false
   NoStaking = true
   NodeType = "explorer"
@@ -86,8 +86,8 @@ Version = "2.5.1"
   RunElasticMode = true
 
 [TiKV]
-  Debug = false
-  PDAddr = ["${tkiv_addr}"]
+  Debug = true
+  PDAddr = ${tkiv_addr}
   Role = "Writer"
   StateDBCacheSizeInMB = 1024
   StateDBCachePersistencePath = "local/fastcache"

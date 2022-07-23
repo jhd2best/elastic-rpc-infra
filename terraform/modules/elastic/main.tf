@@ -10,7 +10,7 @@ locals {
   maxShards        = 8
   dnsInitPort      = 6000
   p2pInitPort      = 9000
-  explorerInitPort = 5000
+  explorerInitPort = 5000 # this is 4000 ports bellow the p2p port https://github.com/harmony-one/harmony/blob/main/api/service/explorer/service.go#L31
   groups = [
     {
       id              = "server"
@@ -74,7 +74,10 @@ module "nomad" {
 }
 
 module "tkiv" {
-  source = "../tkiv"
+  source     = "../tkiv"
+  domain     = local.domain
+  subnet_ids = data.aws_subnet.public.*.id
+  vpc        = data.aws_vpc.vpc
 }
 
 module "redis" {
@@ -102,7 +105,7 @@ module "jobs" {
       shard_http_endpoint          = "api${bd.shard_number}.${local.domain}"
       shard_number                 = bd.shard_number
       redis_addr                   = "${module.redis.shard_addresses[bd.shard_number]}:${module.redis.shard_ports[bd.shard_number]}"
-      tkiv_addr                    = module.tkiv.tkiv_url
+      tkiv_pd_addrs                = module.tkiv.pid_urls
       other_supported_domains_http = bd.other_supported_domains_http
       other_supported_domains_wss  = bd.other_supported_domains_wss
     }
