@@ -39,35 +39,36 @@ data "aws_acm_certificate" "external_certs" {
   domain   = each.value
 }
 
-# only import certificates from domains we don't know
-data "aws_acm_certificate" "internal_certs" {
-  for_each = toset(local.internal_domains)
-  domain   = each.value
+## only import certificates from domains we don't know
+#data "aws_acm_certificate" "internal_certs" {
+#  for_each = toset(local.internal_domains)
+#  domain   = each.value
+#}
+
+# if the domain is within the root domain (hosting zone) then created
+resource "aws_acm_certificate" "internal_certs" {
+  for_each          = toset(local.internal_domains)
+  domain_name       = each.key
+  validation_method = "DNS"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
-## if the domain is within the root domain (hosting zone) then created
-#resource "aws_acm_certificate" "internal_certs" {
-#  count = length(local.internal_domains)
-#  domain_name       = local.internal_domains[count.index]
-#  validation_method = "DNS"
-#
-#  lifecycle {
-#    create_before_destroy = true
-#  }
-#}
-#
-#resource "aws_route53_record" "validate_internal" {
-#  count = length(local.internal_dvo)
-#
-#  name            = local.internal_dvo[count.index].resource_record_name
-#  records         = [local.internal_dvo[count.index].resource_record_value]
-#  ttl             = 60
-#  type            = local.internal_dvo[count.index].resource_record_type
-#  zone_id         = local.zone_id
-#}
+resource "aws_route53_record" "validate_internal" {
+  count = length(local.internal_dvo)
 
-#resource "aws_acm_certificate_validation" "validate_internal" {
-#  count = length(local.internal_domains)
-#  certificate_arn         = aws_acm_certificate.internal_certs[count.index].arn
-#  validation_record_fqdns = [aws_route53_record.validate_internal.*.fqdn]
-#}
+  allow_overwrite = true
+  name            = local.internal_dvo[count.index].resource_record_name
+  records         = [local.internal_dvo[count.index].resource_record_value]
+  ttl             = 60
+  type            = local.internal_dvo[count.index].resource_record_type
+  zone_id         = local.zone_id
+}
+
+resource "aws_acm_certificate_validation" "validate_internal" {
+  for_each                = toset(local.internal_domains)
+  certificate_arn         = aws_acm_certificate.internal_certs[each.key].arn
+  validation_record_fqdns = [for record in aws_route53_record.validate_internal : record.fqdn]
+}

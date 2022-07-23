@@ -40,16 +40,16 @@ locals {
 
   internal_cert_per_lb = flatten([
     for pk, shard in local.fabio_shard : [
-      for domain in local.internal_domains : {
+      for dix, domain in local.internal_domains : {
         shard_number    = shard.shard_number
         domain          = domain
         listener_arn    = aws_lb_listener.https[shard.shard_number].arn
-        certificate_arn = data.aws_acm_certificate.internal_certs[domain].arn
+        certificate_arn = aws_acm_certificate.internal_certs[domain].arn
       } if contains(shard.other_supported_domains, domain)
     ]
   ])
 
-  #internal_dvo = flatten(aws_acm_certificate.internal_certs.*.domain_validation_options)
+  internal_dvo = flatten([for record in aws_acm_certificate.internal_certs : record.domain_validation_options])
 }
 
 resource "null_resource" "wait_for_nomad" {

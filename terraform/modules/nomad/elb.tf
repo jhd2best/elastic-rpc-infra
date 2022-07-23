@@ -86,5 +86,5 @@ resource "aws_lb_listener_certificate" "internal" {
   listener_arn    = each.value[0].listener_arn
   certificate_arn = each.value[0].certificate_arn
 
-  depends_on = [data.aws_acm_certificate.internal_certs, aws_lb_listener.https]
+  depends_on = [aws_acm_certificate.internal_certs, aws_lb_listener.https]
 }
