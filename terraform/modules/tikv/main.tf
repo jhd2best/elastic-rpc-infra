@@ -4,7 +4,17 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.0"
     }
+
+    tls = {
+      source = "hashicorp/tls"
+      version = "4.0.1"
+    }
   }
+}
+
+resource "tls_private_key" "tikv_nodes" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 data "aws_route53_zone" "selected" {
@@ -87,12 +97,17 @@ resource "aws_security_group_rule" "open_tikv" {
   security_group_id = aws_security_group.tikv_nodes.id
 }
 
+resource "aws_key_pair" "tikv_node" {
+  key_name   = "tikv-node-key-pair"
+  public_key = trimspace(tls_private_key.tikv_nodes.public_key_openssh)
+}
+
 resource "aws_instance" "pd_tiup" {
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.tikv_pd_node_instance_type
   availability_zone = var.availability_zone
   subnet_id     = data.aws_subnet.selected.id // make sure all nodes are created in same subnet
-  key_name      = var.key_name
+  key_name      = aws_key_pair.tikv_node.key_name
   security_groups = [aws_security_group.tikv_nodes.id]
 
   root_block_device {
@@ -109,14 +124,14 @@ resource "aws_instance" "pd_tiup" {
     host        = "${self.public_ip}"
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file(var.private_key_path)
+    private_key = trimspace(tls_private_key.tikv_nodes.private_key_openssh)
     agent       = false
   }
 
   provisioner "file" {
     content = <<EOF
       ${templatefile("${path.module}/files/init-pd.sh.tftpl", {
-          public_key = "${file(var.public_key_path)}",
+          public_key = "${trimspace(tls_private_key.tikv_nodes.public_key_openssh)}",
       })}
     EOF
     destination = "/home/ubuntu/init.sh"
@@ -131,6 +146,8 @@ resource "aws_instance" "pd_tiup" {
       "tiup --binary cluster",
     ]
   }
+
+  depends_on = [ aws_key_pair.tikv_node ]
 }
 
 resource "aws_eip" "pd_tiup" {
@@ -147,7 +164,7 @@ resource "aws_instance" "pd_normal" {
   instance_type = var.tikv_pd_node_instance_type
   availability_zone = var.availability_zone
   subnet_id     = data.aws_subnet.selected.id
-  key_name      = var.key_name
+  key_name      = aws_key_pair.tikv_node.key_name
   security_groups = [aws_security_group.tikv_nodes.id]
 
   root_block_device {
@@ -164,14 +181,14 @@ resource "aws_instance" "pd_normal" {
     host        = "${self.public_ip}"
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file(var.private_key_path)
+    private_key = trimspace(tls_private_key.tikv_nodes.private_key_openssh)
     agent       = false
   }
 
   provisioner "file" {
     content = <<EOF
       ${templatefile("${path.module}/files/init-pd.sh.tftpl", {
-          public_key = "${file(var.public_key_path)}",
+          public_key = "${trimspace(tls_private_key.tikv_nodes.public_key_openssh)}",
       })}
     EOF
     destination = "/home/ubuntu/init.sh"
@@ -193,7 +210,7 @@ resource "aws_instance" "data_normal" {
   instance_type = var.tikv_data_node_instance_type
   availability_zone = var.availability_zone
   subnet_id     = data.aws_subnet.selected.id
-  key_name      = var.key_name
+  key_name      = aws_key_pair.tikv_node.key_name
   security_groups = [aws_security_group.tikv_nodes.id]
 
   root_block_device {
@@ -210,14 +227,14 @@ resource "aws_instance" "data_normal" {
     host        = "${self.public_ip}"
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file(var.private_key_path)
+    private_key = trimspace(tls_private_key.tikv_nodes.private_key_openssh)
     agent       = false
   }
 
   provisioner "file" {
     content = <<EOF
       ${templatefile("${path.module}/files/init-data.sh.tftpl", {
-          public_key = "${file(var.public_key_path)}",
+          public_key = "${trimspace(tls_private_key.tikv_nodes.public_key_openssh)}",
       })}
     EOF
     destination = "/home/ubuntu/init.sh"
@@ -246,12 +263,12 @@ resource "null_resource" "launch_tikv" {
     host        = local.pd_tiup_public_ip
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file(var.private_key_path)
+    private_key = trimspace(tls_private_key.tikv_nodes.private_key_openssh)
     agent       = false
   }
 
   provisioner "file" {
-    source      = var.private_key_path
+    content     = tls_private_key.tikv_nodes.private_key_openssh
     destination = "/home/ubuntu/.ssh/id_rsa"
   }
 

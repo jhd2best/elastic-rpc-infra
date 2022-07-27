@@ -43,21 +43,6 @@ variable "tikv_data_node_instance_type" {
   type = string
 }
 
-variable "key_name" {
-  description = "the secret key name in AWS for creating each instance"
-  type = string
-}
-
-variable "private_key_path" {
-  description = "the path of private key match with secret key in AWS"
-  type = string
-}
-
-variable "public_key_path" {
-  description = "the path of public key match with secret key in AWS"
-  type = string
-}
-
 variable "cluster_version" {
   description = "the tikv version wanted for the tkiv cluster. like 'v5.3.1'"
   default = "v5.3.1"
