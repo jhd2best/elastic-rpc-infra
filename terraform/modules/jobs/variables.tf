@@ -2,6 +2,7 @@ variable "env" {}
 variable "network" {}
 variable "region" {}
 variable "nomad" {}
+variable "is_cluster_public" { type = bool }
 
 variable "boot_nodes" {}
 variable "dns_init_port" {}

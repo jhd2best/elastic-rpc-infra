@@ -86,6 +86,8 @@ job "erpc-reader-${shard}" {
 
       env {
        # LOAD_PRE_FETCH = "yes"
+        IS_CLUSTER_PUBLIC_ECHO = "${is_cluster_public}"
+        random_number = "${random_number}"
       }
 
       artifact {

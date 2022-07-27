@@ -7,10 +7,11 @@ terraform {
 }
 
 locals {
-  maxShards        = 8
-  dnsInitPort      = 6000
-  p2pInitPort      = 9000
-  explorerInitPort = 5000 # this is 4000 ports bellow the p2p port https://github.com/harmony-one/harmony/blob/main/api/service/explorer/service.go#L31
+  is_cluster_public = false
+  maxShards         = 8
+  dnsInitPort       = 6000
+  p2pInitPort       = 9000
+  explorerInitPort  = 5000 # this is 4000 ports bellow the p2p port https://github.com/harmony-one/harmony/blob/main/api/service/explorer/service.go#L31
   groups = [
     {
       id              = "server"
@@ -75,12 +76,13 @@ module "nomad" {
 }
 
 module "tkiv" {
-  source       = "../tikv"
-  domain       = local.domain
-  subnets_ids  = aws_subnet.public.*.id
-  vpc_id       = aws_vpc.vpc.id
-  zone_id      = var.web_zone_id
-  cluster_name = local.cluster_id
+  source            = "../tikv"
+  domain            = local.domain
+  subnets_ids       = aws_subnet.public.*.id
+  vpc_id            = aws_vpc.vpc.id
+  zone_id           = var.web_zone_id
+  cluster_name      = local.cluster_id
+  is_cluster_public = local.is_cluster_public
 }
 
 module "redis" {
@@ -96,12 +98,13 @@ module "redis" {
 }
 
 module "jobs" {
-  source     = "../../modules/jobs"
-  env        = var.env
-  network    = var.network
-  nomad      = module.nomad
-  region     = var.region
-  boot_nodes = var.boot_nodes
+  source            = "../../modules/jobs"
+  env               = var.env
+  network           = var.network
+  nomad             = module.nomad
+  region            = var.region
+  boot_nodes        = var.boot_nodes
+  is_cluster_public = local.is_cluster_public
   shard_config = [
     for k, bd in var.shard_conf : {
       shard_wss_endpoint           = "ws${bd.shard_number}.${local.domain}"

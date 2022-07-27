@@ -32,6 +32,8 @@ job "erpc-writer-${shard}" {
       }
 
       env {
+        IS_CLUSTER_PUBLIC_ECHO = "${is_cluster_public}"
+        random_number = "${random_number}"
       }
 
       artifact {
