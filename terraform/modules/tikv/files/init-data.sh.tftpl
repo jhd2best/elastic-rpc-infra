@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -ex
+
+# raid0
+mdadm -C -v /dev/md0 -l 0 -n 2 /dev/nvme1n1 /dev/nvme2n1
+
+# format
+mkfs.ext4 -F /dev/md0
+
+mkdir /data
+
+# add fstab
+echo `blkid /dev/md0 | awk '{print $2}' | sed 's/\"//g'` /data ext4 defaults,nodelalloc,noatime 0 0 >> /etc/fstab
+
+mount -a
+
+mkdir /data/tikv-data
+
+useradd tikv
+echo 'tikv ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+mkdir -p /home/tikv/.ssh
+echo '${public_key}' >> /home/tikv/.ssh/authorized_keys
+chmod 600 /home/tikv/.ssh/authorized_keys
+
+chown -R tikv:tikv /home/tikv
+chown -R tikv:tikv /data/tikv-data
+
+apt install -y numactl

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -ex
+
+mkdir -p /data/tikv-data
+
+useradd tikv
+echo 'tikv ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+mkdir -p /home/tikv/.ssh
+echo '${public_key}' >> /home/tikv/.ssh/authorized_keys
+chmod 600 /home/tikv/.ssh/authorized_keys
+
+chown -R tikv:tikv /home/tikv
+chown -R tikv:tikv /data/tikv-data
+
+apt install -y numactl
