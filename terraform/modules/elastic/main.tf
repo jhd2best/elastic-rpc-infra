@@ -75,12 +75,12 @@ module "nomad" {
 }
 
 module "tkiv" {
-  source            = "../tikv"
-  domain            = local.domain
-  availability_zone = aws_subnet.public[0].availability_zone
-  vpc_id            = aws_vpc.vpc.id
-  zone_id           = var.web_zone_id
-  cluster_name      = local.cluster_id
+  source       = "../tikv"
+  domain       = local.domain
+  subnets_ids  = aws_subnet.public.*.id
+  vpc_id       = aws_vpc.vpc.id
+  zone_id      = var.web_zone_id
+  cluster_name = local.cluster_id
 }
 
 module "redis" {

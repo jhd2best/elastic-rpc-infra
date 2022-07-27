@@ -19,9 +19,9 @@ variable "manager_cidr_block" {
   type        = string
 }
 
-variable "availability_zone" {
-  description = "zone the tkiv should be created into. like 'us-west-2a'"
-  type        = string
+variable "subnets_ids" {
+  description = "subnets into which the tkiv nodes will get deployed evenly"
+  type        = list(string)
 }
 
 variable "tkiv_pd_node_number" {

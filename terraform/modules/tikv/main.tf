@@ -16,12 +16,6 @@ data "aws_vpc" "selected" {
   id = var.vpc_id
 }
 
-// check subnet exist
-data "aws_subnet" "selected" {
-  vpc_id            = var.vpc_id
-  availability_zone = var.availability_zone
-}
-
 locals {
   pd_tiup_public_ip  = aws_eip.pd_tiup.public_ip
   pd_tiup_private_ip = aws_instance.pd_tiup.private_ip
@@ -41,8 +35,8 @@ locals {
     }
   }
 
-  pd_domain = "pd.${var.domain}"
-  tiup_domain = "monitor.pd.${var.domain}"
+  pd_domain   = "pd.${var.domain}"
+  tiup_domain = "tiupd.${var.domain}"
 }
 
 resource "null_resource" "launch_tikv" {
@@ -84,5 +78,5 @@ resource "null_resource" "launch_tikv" {
     ]
   }
 
-  depends_on = [aws_route53_record.domain_data, aws_route53_record.domain_pd, aws_route53_record.domain_pds]
+  depends_on = [aws_route53_record.domain_data, aws_route53_record.domain_pd, aws_route53_record.domain_pds, aws_route53_record.tui_pd]
 }

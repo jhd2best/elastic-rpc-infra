@@ -13,9 +13,9 @@ resource "aws_route53_record" "tui_pd" {
   name    = local.tiup_domain
   type    = "A"
   ttl     = 60
-  records = [aws_instance.pd_tiup.public_ip]
+  records = [var.is_cluster_public ? aws_instance.pd_tiup.public_ip : aws_instance.pd_tiup.private_ip]
 
-  depends_on = [aws_instance.pd_tiup, aws_instance.pd_normal]
+  depends_on = [aws_instance.pd_tiup]
 }
 
 resource "aws_route53_record" "domain_pds" {

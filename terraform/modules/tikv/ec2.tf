@@ -33,8 +33,7 @@ resource "aws_eip" "pd_tiup" {
 resource "aws_instance" "pd_tiup" {
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.tikv_pd_node_instance_type
-  availability_zone      = var.availability_zone
-  subnet_id              = data.aws_subnet.selected.id // make sure all nodes are created in same subnet
+  subnet_id              = var.subnets_ids[length(var.subnets_ids) - 1]
   key_name               = aws_key_pair.tikv_node.key_name
   vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
   iam_instance_profile   = aws_iam_instance_profile.smm-role.name
@@ -90,8 +89,7 @@ resource "aws_instance" "pd_normal" {
 
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.tikv_pd_node_instance_type
-  availability_zone      = var.availability_zone
-  subnet_id              = data.aws_subnet.selected.id
+  subnet_id              = var.subnets_ids[count.index % length(var.subnets_ids)]
   key_name               = aws_key_pair.tikv_node.key_name
   vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
   iam_instance_profile   = aws_iam_instance_profile.smm-role.name
@@ -121,8 +119,7 @@ resource "aws_instance" "data_normal" {
 
   ami                    = data.aws_ami.ubuntu.id
   instance_type          = var.tikv_data_node_instance_type
-  availability_zone      = var.availability_zone
-  subnet_id              = data.aws_subnet.selected.id
+  subnet_id              = var.subnets_ids[count.index % length(var.subnets_ids)]
   key_name               = aws_key_pair.tikv_node.key_name
   vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
   iam_instance_profile   = aws_iam_instance_profile.smm-role.name
