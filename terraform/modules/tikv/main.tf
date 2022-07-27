@@ -29,7 +29,7 @@ locals {
     private_ip : local.pd_private_ips[num]
     }
   }
-  data_domains = { for num in range(var.tkiv_data_node_number) : "tkivdata${num}.${var.domain}" => {
+  data_domains = { for num in range(var.tkiv_data_node_number) : "tikvdata${num}.${var.domain}" => {
     public_ip : local.data_public_ips[num]
     private_ip : local.data_private_ips[num]
     }

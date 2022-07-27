@@ -1,6 +1,6 @@
 locals {
   harmony_binary_path = "elastic_rpc_cluster/bin/harmony"
-  random_number = 2342 # this is to force an update on all rpc jobs
+  random_number       = 2342 # this is to force an update on all rpc jobs
 }
 
 resource "nomad_job" "elastic_reader" {
@@ -8,7 +8,7 @@ resource "nomad_job" "elastic_reader" {
   jobspec = templatefile("${path.module}/jobs/elastic_reader.nomad", {
     shard             = each.key
     binary_path       = local.harmony_binary_path
-    random_number       = local.random_number
+    random_number     = local.random_number
     tkiv_addr         = "[\"${join("\", \"", each.value.tkiv_pd_addrs)}\"]"
     redis_addr        = each.value.redis_addr
     boot_nodes        = var.boot_nodes
@@ -26,7 +26,7 @@ resource "nomad_job" "elastic_writer" {
   jobspec = templatefile("${path.module}/jobs/elastic_writer.nomad", {
     shard              = each.key
     binary_path        = local.harmony_binary_path
-    random_number        = local.random_number
+    random_number      = local.random_number
     tkiv_addr          = "[\"${join("\", \"", each.value.tkiv_pd_addrs)}\"]"
     redis_addr         = each.value.redis_addr
     boot_nodes         = var.boot_nodes
