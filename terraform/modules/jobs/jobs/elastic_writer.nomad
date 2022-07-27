@@ -86,7 +86,7 @@ Version = "2.5.1"
   RunElasticMode = true
 
 [TiKV]
-  Debug = true
+  Debug = false
   PDAddr = ${tkiv_addr}
   Role = "Writer"
   StateDBCacheSizeInMB = 1024

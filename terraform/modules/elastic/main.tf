@@ -32,6 +32,7 @@ locals {
   ]
   project    = "elastic-rpc"
   domain     = "${var.region}.${var.env}.${var.domain}"
+  cluster_id = "erpc-${var.env}-${var.region}"
   rootDomain = var.domain
 }
 
@@ -47,8 +48,8 @@ module "nomad" {
   domain         = local.domain
   rootDomain     = local.rootDomain
   env            = var.env
-  project        = "erpc-${var.env}-${var.region}"
-  cluster_id     = "erpc-${var.env}-${var.region}"
+  project        = local.cluster_id
+  cluster_id     = local.cluster_id
   ssh_key_name   = data.aws_key_pair.harmony.key_name
   zone_id        = var.web_zone_id
   vpc            = aws_vpc.vpc
@@ -79,6 +80,7 @@ module "tkiv" {
   availability_zone = aws_subnet.public[0].availability_zone
   vpc_id            = aws_vpc.vpc.id
   zone_id           = var.web_zone_id
+  cluster_name      = local.cluster_id
 }
 
 module "redis" {

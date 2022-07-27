@@ -22,7 +22,7 @@ provider "aws" {
   default_tags {
     tags = {
       Environment = "Mainnet"       # change this if new region or env launched
-      Region      = "Eu Franfkfurt" # change this if new region or env launched
+      Region      = "EU Franfkfurt" # change this if new region or env launched
       Owner       = "DevOps Guild"
       Project     = "elastic-rpc-infra"
     }

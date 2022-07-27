@@ -37,6 +37,7 @@ resource "aws_instance" "pd_tiup" {
   subnet_id              = data.aws_subnet.selected.id // make sure all nodes are created in same subnet
   key_name               = aws_key_pair.tikv_node.key_name
   vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
+  iam_instance_profile   = aws_iam_instance_profile.smm-role.name
 
   root_block_device {
     volume_type           = "gp2"
@@ -45,7 +46,7 @@ resource "aws_instance" "pd_tiup" {
   }
 
   tags = {
-    Name = "tikv-pd-1"
+    Name = "${var.cluster_name}-tikv-pd-1"
   }
 
   connection {
@@ -93,6 +94,7 @@ resource "aws_instance" "pd_normal" {
   subnet_id              = data.aws_subnet.selected.id
   key_name               = aws_key_pair.tikv_node.key_name
   vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
+  iam_instance_profile   = aws_iam_instance_profile.smm-role.name
 
   root_block_device {
     volume_type           = "gp2"
@@ -101,7 +103,7 @@ resource "aws_instance" "pd_normal" {
   }
 
   tags = {
-    Name = "tikv-pd-${count.index + 2}"
+    Name = "${var.cluster_name}-tikv-pd-${count.index + 2}"
   }
 
   user_data = data.template_file.user_data_pd_normal.rendered
@@ -123,6 +125,7 @@ resource "aws_instance" "data_normal" {
   subnet_id              = data.aws_subnet.selected.id
   key_name               = aws_key_pair.tikv_node.key_name
   vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
+  iam_instance_profile   = aws_iam_instance_profile.smm-role.name
 
   root_block_device {
     volume_type           = "gp2"
@@ -131,7 +134,7 @@ resource "aws_instance" "data_normal" {
   }
 
   tags = {
-    Name = "tikv-data-${count.index + 1}"
+    Name = "${var.cluster_name}-tikv-data-${count.index + 1}"
   }
 
   user_data = data.template_file.user_data_normal.rendered
