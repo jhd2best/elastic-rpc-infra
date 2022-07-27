@@ -9,7 +9,7 @@ variable "vpc_id" {
 }
 
 variable "manager_cidr_block" {
-  description = "cidr block of ips which can access by ssh"
+  description = "cidr block of ips which can manage cluster"
   default = "0.0.0.0/0"
   type = string
 }

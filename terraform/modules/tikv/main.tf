@@ -77,14 +77,14 @@ resource "aws_security_group" "tikv_nodes" {
 }
 
 resource "aws_security_group_rule" "open_tikv" {
+  count = var.is_cluster_public ? 1 : 0
+
   type              = "ingress"
   from_port         = 2379
   to_port           = 2379
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.tikv_nodes.id
-
-  count = var.is_cluster_public ? 1 : 0
 }
 
 resource "aws_instance" "pd_tiup" {
@@ -141,6 +141,8 @@ resource "aws_eip" "pd_tiup" {
 }
 
 resource "aws_instance" "pd_normal" {
+  count = var.tkiv_pd_node_number > 1 ? var.tkiv_pd_node_number - 1 : 0
+
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.tikv_pd_node_instance_type
   availability_zone = var.availability_zone
@@ -181,11 +183,12 @@ resource "aws_instance" "pd_normal" {
     ]
   }
 
-  count = var.tkiv_pd_node_number > 1 ? var.tkiv_pd_node_number - 1 : 0
   depends_on = [ aws_instance.pd_tiup ]
 }
 
 resource "aws_instance" "data_normal" {
+  count = var.tkiv_data_node_number
+
   ami           = data.aws_ami.ubuntu.id
   instance_type = var.tikv_data_node_instance_type
   availability_zone = var.availability_zone
@@ -226,7 +229,6 @@ resource "aws_instance" "data_normal" {
     ]
   }
 
-  count = var.tkiv_data_node_number
   depends_on = [ aws_instance.pd_tiup ]
 }
 
@@ -238,6 +240,8 @@ locals {
 }
 
 resource "null_resource" "launch_tikv" {
+  count = 1
+
   connection {
     host        = local.pd_tiup_public_ip
     type        = "ssh"
@@ -274,7 +278,6 @@ ${templatefile("${path.module}/files/topology.yaml.tftpl", {
     ]
   }
 
-  count = 1
   depends_on = [ aws_instance.pd_tiup, aws_instance.pd_normal, aws_instance.data_normal ]
 }
 
