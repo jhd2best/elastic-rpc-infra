@@ -38,7 +38,7 @@ variable "tikv_pd_node_instance_type" {
 
 variable "tkiv_data_node_number" {
   description = "this will be the number of tkiv data nodes wanted in per cluster"
-  default     = 3
+  default     = 2
   type        = number
 }
 

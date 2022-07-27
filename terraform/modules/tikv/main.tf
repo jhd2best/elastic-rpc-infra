@@ -1,8 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
+      source = "hashicorp/aws"
     }
 
     tls = {
@@ -19,7 +18,7 @@ data "aws_vpc" "selected" {
 
 // check subnet exist
 data "aws_subnet" "selected" {
-  vpc_id            = data.aws_vpc.selected.id
+  vpc_id            = var.vpc_id
   availability_zone = var.availability_zone
 }
 
@@ -59,9 +58,11 @@ resource "null_resource" "launch_tikv" {
 
   provisioner "remote-exec" {
     inline = [
+      "sleep 20",
       "export PATH=/home/ubuntu/.tiup/bin:$PATH",
       "tiup cluster check ./topology.yaml --apply --user tikv",
       "tiup cluster deploy ${var.cluster_name} ${var.cluster_version} ./topology.yaml --user tikv -y",
+      "sleep 30",
       "tiup cluster start ${var.cluster_name}",
       "sleep 10",
       "tiup cluster display ${var.cluster_name}",

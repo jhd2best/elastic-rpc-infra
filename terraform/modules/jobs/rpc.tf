@@ -1,5 +1,5 @@
 locals {
-  harmony_binary_path = "elastic_rpc_cluster/bin/harmony-writer-fix-stucked"
+  harmony_binary_path = "elastic_rpc_cluster/bin/harmony"
 }
 
 resource "nomad_job" "elastic_reader" {

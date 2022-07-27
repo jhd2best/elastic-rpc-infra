@@ -23,13 +23,20 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+resource "aws_eip" "pd_tiup" {
+  instance = aws_instance.pd_tiup.id
+  vpc      = true
+
+  depends_on = [aws_instance.pd_tiup]
+}
+
 resource "aws_instance" "pd_tiup" {
-  ami               = data.aws_ami.ubuntu.id
-  instance_type     = var.tikv_pd_node_instance_type
-  availability_zone = var.availability_zone
-  subnet_id         = data.aws_subnet.selected.id // make sure all nodes are created in same subnet
-  key_name          = aws_key_pair.tikv_node.key_name
-  security_groups   = [aws_security_group.tikv_nodes.id]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.tikv_pd_node_instance_type
+  availability_zone      = var.availability_zone
+  subnet_id              = data.aws_subnet.selected.id // make sure all nodes are created in same subnet
+  key_name               = aws_key_pair.tikv_node.key_name
+  vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
 
   root_block_device {
     volume_type           = "gp2"
@@ -67,25 +74,25 @@ resource "aws_instance" "pd_tiup" {
     ]
   }
 
-  depends_on = [aws_key_pair.tikv_node]
+  depends_on = [aws_instance.data_normal, aws_instance.pd_normal]
 }
 
-resource "aws_eip" "pd_tiup" {
-  instance = aws_instance.pd_tiup.id
-  vpc      = true
-
-  depends_on = [aws_instance.pd_tiup]
+data "template_file" "user_data_pd_normal" {
+  template = format("%s", file("${path.module}/files/init-pd.sh.tftpl"))
+  vars = {
+    public_key = trimspace(tls_private_key.tikv_nodes.public_key_openssh),
+  }
 }
 
 resource "aws_instance" "pd_normal" {
   count = var.tkiv_pd_node_number > 1 ? var.tkiv_pd_node_number - 1 : 0
 
-  ami               = data.aws_ami.ubuntu.id
-  instance_type     = var.tikv_pd_node_instance_type
-  availability_zone = var.availability_zone
-  subnet_id         = data.aws_subnet.selected.id
-  key_name          = aws_key_pair.tikv_node.key_name
-  security_groups   = [aws_security_group.tikv_nodes.id]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.tikv_pd_node_instance_type
+  availability_zone      = var.availability_zone
+  subnet_id              = data.aws_subnet.selected.id
+  key_name               = aws_key_pair.tikv_node.key_name
+  vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
 
   root_block_device {
     volume_type           = "gp2"
@@ -97,39 +104,25 @@ resource "aws_instance" "pd_normal" {
     Name = "tikv-pd-${count.index + 2}"
   }
 
-  connection {
-    host        = self.public_ip
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = trimspace(tls_private_key.tikv_nodes.private_key_pem)
-    agent       = false
-  }
+  user_data = data.template_file.user_data_pd_normal.rendered
+}
 
-  provisioner "file" {
-    content = templatefile("${path.module}/files/init-pd.sh.tftpl", {
-      public_key = trimspace(tls_private_key.tikv_nodes.public_key_openssh),
-    })
-    destination = "/home/ubuntu/init.sh"
+data "template_file" "user_data_normal" {
+  template = format("%s", file("${path.module}/files/init-data.sh.tftpl"))
+  vars = {
+    public_key = trimspace(tls_private_key.tikv_nodes.public_key_openssh),
   }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x /home/ubuntu/init.sh && sudo /home/ubuntu/init.sh",
-    ]
-  }
-
-  depends_on = [aws_instance.pd_tiup]
 }
 
 resource "aws_instance" "data_normal" {
   count = var.tkiv_data_node_number
 
-  ami               = data.aws_ami.ubuntu.id
-  instance_type     = var.tikv_data_node_instance_type
-  availability_zone = var.availability_zone
-  subnet_id         = data.aws_subnet.selected.id
-  key_name          = aws_key_pair.tikv_node.key_name
-  security_groups   = [aws_security_group.tikv_nodes.id]
+  ami                    = data.aws_ami.ubuntu.id
+  instance_type          = var.tikv_data_node_instance_type
+  availability_zone      = var.availability_zone
+  subnet_id              = data.aws_subnet.selected.id
+  key_name               = aws_key_pair.tikv_node.key_name
+  vpc_security_group_ids = [aws_security_group.tikv_nodes.id]
 
   root_block_device {
     volume_type           = "gp2"
@@ -141,26 +134,5 @@ resource "aws_instance" "data_normal" {
     Name = "tikv-data-${count.index + 1}"
   }
 
-  connection {
-    host        = self.public_ip
-    type        = "ssh"
-    user        = "ubuntu"
-    private_key = trimspace(tls_private_key.tikv_nodes.private_key_pem)
-    agent       = false
-  }
-
-  provisioner "file" {
-    content = templatefile("${path.module}/files/init-data.sh.tftpl", {
-      public_key = trimspace(tls_private_key.tikv_nodes.public_key_openssh),
-    })
-    destination = "/home/ubuntu/init.sh"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "chmod +x /home/ubuntu/init.sh && sudo /home/ubuntu/init.sh",
-    ]
-  }
-
-  depends_on = [aws_instance.pd_tiup]
+  user_data = data.template_file.user_data_normal.rendered
 }

@@ -76,8 +76,7 @@ module "nomad" {
 module "tkiv" {
   source            = "../tikv"
   domain            = local.domain
-  subnet_ids        = aws_subnet.public.*.id
-  availability_zone = aws_subnet[0].public.availability_zone
+  availability_zone = aws_subnet.public[0].availability_zone
   vpc_id            = aws_vpc.vpc.id
   zone_id           = var.web_zone_id
 }
