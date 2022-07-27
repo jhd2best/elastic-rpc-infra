@@ -7,14 +7,14 @@ server_configs:
   pd:
     replication.max-replicas: ${replicas_count}
 pd_servers:
-%{ for pd_private_ip in pd_private_ips ~}
-  - host: "${pd_private_ip}"
+%{ for host in pd_hosts ~}
+  - host: "${host}"
 %{ endfor ~}
 tikv_servers:
-%{ for data_private_ip in data_private_ips ~}
-  - host: "${data_private_ip}"
+%{ for host in data_hosts ~}
+  - host: "${host}"
 %{ endfor ~}
 monitoring_servers:
-  - host: "${pd_tiup_private_ip}"
+  - host: "${pd_tiup_host}"
 grafana_servers:
-  - host: "${pd_tiup_private_ip}"
+  - host: "${pd_tiup_host}"

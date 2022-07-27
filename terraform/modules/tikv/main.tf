@@ -26,8 +26,23 @@ locals {
   pd_tiup_public_ip  = aws_eip.pd_tiup.public_ip
   pd_tiup_private_ip = aws_instance.pd_tiup.private_ip
   pd_private_ips     = concat([aws_instance.pd_tiup.private_ip], aws_instance.pd_normal.*.private_ip)
+  pd_public_ips      = concat([aws_instance.pd_tiup.public_ip], aws_instance.pd_normal.*.public_ip)
   data_private_ips   = aws_instance.data_normal.*.private_ip
-  pd_domain          = "pd.${var.domain}"
+  data_public_ips    = aws_instance.data_normal.*.public_ip
+
+  pd_domains = { for num in range(var.tkiv_pd_node_number) : "pd${num}.${var.domain}" => {
+    public_ip : local.pd_public_ips[num]
+    private_ip : local.pd_private_ips[num]
+    }
+  }
+  data_domains = { for num in range(var.tkiv_data_node_number) : "tkivdata${num}.${var.domain}" => {
+    public_ip : local.data_public_ips[num]
+    private_ip : local.data_private_ips[num]
+    }
+  }
+
+  pd_domain = "pd.${var.domain}"
+  tiup_domain = "monitor.pd.${var.domain}"
 }
 
 resource "null_resource" "launch_tikv" {
@@ -48,10 +63,10 @@ resource "null_resource" "launch_tikv" {
 
   provisioner "file" {
     content = templatefile("${path.module}/files/topology.yaml.tftpl", {
-      pd_tiup_private_ip = local.pd_tiup_private_ip,
-      pd_private_ips     = local.pd_private_ips,
-      data_private_ips   = local.data_private_ips,
-      replicas_count     = var.tkiv_replication_factor,
+      pd_tiup_host   = local.tiup_domain,
+      pd_hosts       = [for domain, ips in local.pd_domains : domain],
+      data_hosts     = [for domain, ips in local.data_domains : domain],
+      replicas_count = var.tkiv_replication_factor,
     })
     destination = "/home/ubuntu/topology.yaml"
   }
@@ -69,5 +84,5 @@ resource "null_resource" "launch_tikv" {
     ]
   }
 
-  depends_on = [aws_instance.pd_tiup, aws_instance.pd_normal, aws_instance.data_normal]
+  depends_on = [aws_route53_record.domain_data, aws_route53_record.domain_pd, aws_route53_record.domain_pds]
 }
