@@ -4,6 +4,12 @@ output "tkiv_pd_url" {
   depends_on  = [null_resource.launch_tikv]
 }
 
+output "tkiv_pd_urls" {
+  description = "the domain include all pd nodes for the tkiv cluster"
+  value       = [for domain, ips in local.pd_domains : "${domain}:2379"]
+  depends_on  = [null_resource.launch_tikv]
+}
+
 output "pd_private_ips" {
   description = "the private ip for each pd node in tkiv cluster"
   value       = local.pd_private_ips

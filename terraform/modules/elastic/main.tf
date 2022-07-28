@@ -111,7 +111,7 @@ module "jobs" {
       shard_http_endpoint          = "api${bd.shard_number}.${local.domain}"
       shard_number                 = bd.shard_number
       redis_addr                   = "${module.redis.shard_addresses[bd.shard_number]}:${module.redis.shard_ports[bd.shard_number]}"
-      tkiv_pd_addrs                = [module.tkiv.tkiv_pd_url]
+      tkiv_pd_addrs                = module.tkiv.tkiv_pd_urls
       other_supported_domains_http = bd.other_supported_domains_http
       other_supported_domains_wss  = bd.other_supported_domains_wss
     }
