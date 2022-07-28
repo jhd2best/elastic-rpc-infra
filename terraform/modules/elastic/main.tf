@@ -7,7 +7,7 @@ terraform {
 }
 
 locals {
-  is_cluster_public = false
+  is_cluster_public = false # use this for maintenance purposes only like syncying the tkiv from another region
   maxShards         = 8
   dnsInitPort       = 6000
   p2pInitPort       = 9000

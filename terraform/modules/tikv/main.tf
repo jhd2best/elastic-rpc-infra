@@ -36,7 +36,6 @@ locals {
   }
 
   pd_domain   = "pd.${var.domain}"
-  tiup_domain = "tiupd.${var.domain}"
 }
 
 resource "null_resource" "launch_tikv" {
@@ -57,7 +56,7 @@ resource "null_resource" "launch_tikv" {
 
   provisioner "file" {
     content = templatefile("${path.module}/files/topology.yaml.tftpl", {
-      pd_tiup_host   = local.tiup_domain,
+      pd_tiup_host   = aws_instance.pd_tiup.private_ip,
       pd_hosts       = [for domain, ips in local.pd_domains : domain],
       data_hosts     = [for domain, ips in local.data_domains : domain],
       replicas_count = var.tkiv_replication_factor,
@@ -78,5 +77,5 @@ resource "null_resource" "launch_tikv" {
     ]
   }
 
-  depends_on = [aws_route53_record.domain_data, aws_route53_record.domain_pd, aws_route53_record.domain_pds, aws_route53_record.tui_pd]
+  depends_on = [aws_route53_record.domain_data, aws_route53_record.domain_pd, aws_route53_record.domain_pds]
 }

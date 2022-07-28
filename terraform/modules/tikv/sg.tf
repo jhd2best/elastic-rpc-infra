@@ -15,6 +15,13 @@ resource "aws_security_group" "tikv_nodes" {
   }
 
   ingress {
+    protocol    = "tcp"
+    from_port   = 22
+    to_port     = 22
+    cidr_blocks = [var.manager_cidr_block]
+  }
+
+  ingress {
     from_port   = 2379
     to_port     = 2379
     protocol    = "tcp"
@@ -22,22 +29,8 @@ resource "aws_security_group" "tikv_nodes" {
   }
 
   ingress {
-    from_port   = 2380
-    to_port     = 2380
-    protocol    = "tcp"
-    cidr_blocks = [var.is_cluster_public ? "0.0.0.0/0" : data.aws_vpc.selected.cidr_block]
-  }
-
-  ingress {
     from_port   = 20160
     to_port     = 20160
-    protocol    = "tcp"
-    cidr_blocks = [var.is_cluster_public ? "0.0.0.0/0" : data.aws_vpc.selected.cidr_block]
-  }
-
-  ingress {
-    from_port   = 20180
-    to_port     = 20180
     protocol    = "tcp"
     cidr_blocks = [var.is_cluster_public ? "0.0.0.0/0" : data.aws_vpc.selected.cidr_block]
   }
