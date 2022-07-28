@@ -70,7 +70,7 @@ Version = "2.5.1"
 [DNSSync]
   Client = true
   LegacySyncing = false
-  Port = {{ env "NOMAD_PORT_dnssync" }}
+  Port = 6000
   Server = true
   ServerPort = {{ env "NOMAD_PORT_dnssync" }}
   Zone = "t.hmny.io"

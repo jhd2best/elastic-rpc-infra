@@ -1,6 +1,6 @@
 locals {
   harmony_binary_path = "elastic_rpc_cluster/bin/harmony"
-  random_number       = 2342 # this is to force an update on all rpc jobs
+  random_number       = 2341 # this is to force an update on all rpc jobs
 }
 
 resource "nomad_job" "elastic_reader" {
