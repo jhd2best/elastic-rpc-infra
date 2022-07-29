@@ -24,18 +24,18 @@ locals {
   data_private_ips   = aws_instance.data_normal.*.private_ip
   data_public_ips    = aws_instance.data_normal.*.public_ip
 
-  pd_domains = { for num in range(var.tkiv_pd_node_number) : "pd${num}.${var.domain}" => {
+  pd_domains = { for num in range(var.tkiv_pd_node_number) : "pd${num}.tikv.${var.domain}" => {
     public_ip : local.pd_public_ips[num]
     private_ip : local.pd_private_ips[num]
     }
   }
-  data_domains = { for num in range(var.tkiv_data_node_number) : "tikvdata${num}.${var.domain}" => {
+  data_domains = { for num in range(var.tkiv_data_node_number) : "data${num}.tikv.${var.domain}" => {
     public_ip : local.data_public_ips[num]
     private_ip : local.data_private_ips[num]
     }
   }
 
-  pd_domain   = "pd.${var.domain}"
+  pd_domain = "pd.${var.domain}"
 }
 
 resource "null_resource" "launch_tikv" {

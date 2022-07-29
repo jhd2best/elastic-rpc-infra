@@ -5,6 +5,7 @@ variable "boot_nodes" {}
 variable "domain" {}
 variable "web_zone_id" {}
 variable "vpc_index" { default = 51 }
+variable "tkiv_data_node_number" { default = 3 }
 variable "instance_type" { default = "c5.4xlarge" }
 variable "redis_version" { default = "redis6.x" }
 

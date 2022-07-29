@@ -8,13 +8,14 @@ terraform {
 
 
 locals {
-  region     = "eu"                           # change this if new region or env launched
-  aws_region = "eu-central-1"                 # change this if new region or env launched
-  env        = "main"                         # change this if new region or env launched # this is used for namespacing so it can be a short version
-  network    = "mainnet"                      # change this if new region or env launched # this is used for node configuration
-  boot_nodes = "/dnsaddr/bootstrap.t.hmny.io" # change this if new region or env launched
-  domain     = "t.hmny.io"                    #hosting zone
-  vpc_index  = 51
+  region           = "eu"                           # change this if new region or env launched
+  aws_region       = "eu-central-1"                 # change this if new region or env launched
+  env              = "main"                         # change this if new region or env launched # this is used for namespacing so it can be a short version
+  network          = "mainnet"                      # change this if new region or env launched # this is used for node configuration
+  boot_nodes       = "/dnsaddr/bootstrap.t.hmny.io" # change this if new region or env launched
+  domain           = "t.hmny.io"                    #hosting zone
+  vpc_index        = 51                             # used to namespace the vpc cdir number, in the case when having multiple clusters in different regions all of them will have a different cidr block
+  tkiv_node_number = 13                             # number of nodes for the tkiv cluster to launch
 }
 
 provider "aws" {
@@ -44,15 +45,16 @@ data "aws_route53_zone" "root" {
 }
 
 module "elastic" {
-  source        = "../../modules/elastic"
-  domain        = local.domain
-  env           = local.env
-  network       = local.network
-  boot_nodes    = local.boot_nodes
-  region        = local.region
-  vpc_index     = local.vpc_index
-  web_zone_id   = data.aws_route53_zone.root.id
-  redis_version = "redis6.x"
+  source                = "../../modules/elastic"
+  domain                = local.domain
+  env                   = local.env
+  network               = local.network
+  boot_nodes            = local.boot_nodes
+  region                = local.region
+  vpc_index             = local.vpc_index
+  web_zone_id           = data.aws_route53_zone.root.id
+  tkiv_data_node_number = local.tkiv_node_number
+  redis_version         = "redis6.x"
   shard_conf = [{
     shard_number                  = 0
     redis_shards                  = 2
