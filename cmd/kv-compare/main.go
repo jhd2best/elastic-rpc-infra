@@ -11,6 +11,7 @@ import (
 	_ "net/http/pprof"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -18,6 +19,7 @@ import (
 /// REQUIRED envs:
 /// SHARD_DATA_FOLDER which defaults to /data/harmony_sharddb_0 if other please pass another env variable
 /// PD_HOST_PORT which defaults to 127:0.0.1:2379 if other please pass another env variable
+/// SHARD_NUMBER which defaults to 0 if other please pass another env variable
 
 const (
 	safePointKey = "kv-compare-safe-point"
@@ -98,7 +100,7 @@ func main() {
 	instance := buildMultiDB(EitherEnvOrDefault("SHARD_DATA_FOLDER", "/data/harmony_sharddb_0"), 8, 4)
 	defer instance.Close()
 
-	prefixStr := []byte(fmt.Sprintf("harmony_tikv_%d/", 0))
+	prefixStr := []byte(fmt.Sprintf("harmony_tikv_%d/", EitherEnvOrDefaultInt("SHARD_NUMBER", 0)))
 	kvInstance, err := compare.NewTiKVInstance([]string{EitherEnvOrDefault("PD_HOST_PORT", "127:0.0.1:2379")}, prefixStr)
 	if err != nil {
 		panic(err)
@@ -148,4 +150,14 @@ func EitherEnvOrDefault(env string, def string) string {
 	} else {
 		return def
 	}
+}
+
+func EitherEnvOrDefaultInt(env string, def int) int {
+	res := EitherEnvOrDefault(env, fmt.Sprintf("%d", def))
+	resI, err := strconv.Atoi(res)
+	if err != nil {
+		panic(fmt.Sprintf("%s env variable should contain a number", env))
+	}
+
+	return resI
 }

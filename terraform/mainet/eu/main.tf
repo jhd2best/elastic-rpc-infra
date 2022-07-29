@@ -26,6 +26,8 @@ provider "aws" {
       Region      = "EU Franfkfurt" # change this if new region or env launched
       Owner       = "DevOps Guild"
       Project     = "elastic-rpc-infra"
+      Repo        = "github.com/harmony-one/elastic-rpc-infra"
+      Terraformed = true
     }
   }
 }
