@@ -26,6 +26,10 @@ job "erpc-writer-${shard}" {
     task "erpc-writer-${shard}" {
       driver = "exec"
 
+      logs {
+        max_files     = 3
+        max_file_size = 5
+      }
       config {
         command = "harmony"
         args = ["--config", "local/config.cfg"]

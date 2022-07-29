@@ -79,6 +79,11 @@ job "erpc-reader-${shard}" {
     task "erpc-reader-${shard}" {
       driver = "exec"
 
+      logs {
+        max_files     = 3
+        max_file_size = 5
+      }
+
       config {
         command = "harmony"
         args = ["--config", "local/config.cfg"]
