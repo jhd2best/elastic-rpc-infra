@@ -106,9 +106,9 @@ Version = "2.5.1"
 [Log]
   FileName = "1.stdharmony.0"
   Folder = "alloc/logs"
-  RotateCount = 0
-  RotateMaxAge = 0
-  RotateSize = 100
+  RotateCount = 3
+  RotateMaxAge = 1
+  RotateSize = 30
   Verbosity = 3
   [Log.VerbosePrints]
     Config = true
