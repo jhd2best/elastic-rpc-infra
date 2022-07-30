@@ -102,7 +102,7 @@ job "erpc-reader-${shard}" {
       }
 
       resources {
-        cpu = 6000
+        cpu = 6500
         memory = 4000
         memory_max = 5000
       }
