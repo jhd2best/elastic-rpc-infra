@@ -7,6 +7,7 @@ import (
 	"github.com/harmony-one/elastic-rpc-infra/pkg/kv-compare-master/compare"
 	"github.com/syndtr/goleveldb/leveldb"
 	"io/ioutil"
+	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
@@ -97,11 +98,20 @@ func main() {
 	//}
 	//defer instance.Close()
 
-	instance := buildMultiDB(EitherEnvOrDefault("SHARD_DATA_FOLDER", "/data/harmony_sharddb_0"), 8, 4)
+	dir := EitherEnvOrDefault("SHARD_DATA_FOLDER", "/data/harmony_sharddb_0")
+	log.Println(fmt.Sprintf("Syncing with dir: %s", dir))
+
+	shardNum := EitherEnvOrDefaultInt("SHARD_NUMBER", 0)
+	log.Println(fmt.Sprintf("Syncing with shard: %d", shardNum))
+
+	tkivUrl := EitherEnvOrDefault("PD_HOST_PORT", "127:0.0.1:2379")
+	log.Println(fmt.Sprintf("Syncing with tikv: %s", dir))
+
+	instance := buildMultiDB(dir, 8, 4)
 	defer instance.Close()
 
-	prefixStr := []byte(fmt.Sprintf("harmony_tikv_%d/", EitherEnvOrDefaultInt("SHARD_NUMBER", 0)))
-	kvInstance, err := compare.NewTiKVInstance([]string{EitherEnvOrDefault("PD_HOST_PORT", "127:0.0.1:2379")}, prefixStr)
+	prefixStr := []byte(fmt.Sprintf("harmony_tikv_%d/", shardNum))
+	kvInstance, err := compare.NewTiKVInstance([]string{tkivUrl}, prefixStr)
 	if err != nil {
 		panic(err)
 	}
