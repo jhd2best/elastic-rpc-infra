@@ -105,7 +105,7 @@ func main() {
 	log.Println(fmt.Sprintf("Syncing with shard: %d", shardNum))
 
 	tkivUrl := EitherEnvOrDefault("PD_HOST_PORT", "127:0.0.1:2379")
-	log.Println(fmt.Sprintf("Syncing with tikv: %s", dir))
+	log.Println(fmt.Sprintf("Syncing with tikv: %s", tkivUrl))
 
 	instance := buildMultiDB(dir, 8, 4)
 	defer instance.Close()
