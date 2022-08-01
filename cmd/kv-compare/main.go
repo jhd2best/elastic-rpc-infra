@@ -18,7 +18,7 @@ import (
 )
 
 /// REQUIRED envs:
-/// SHARD_DATA_FOLDER which defaults to /data/harmony_sharddb_0 if other please pass another env variable
+/// SHARD_DATA_FOLDER which defaults to /data/harmony/harmony_db_0 if other please pass another env variable
 /// PD_HOST_PORT which defaults to 127:0.0.1:2379 if other please pass another env variable
 /// SHARD_NUMBER which defaults to 0 if other please pass another env variable
 
@@ -98,7 +98,7 @@ func main() {
 	//}
 	//defer instance.Close()
 
-	dir := EitherEnvOrDefault("SHARD_DATA_FOLDER", "/data/harmony_sharddb_0")
+	dir := EitherEnvOrDefault("SHARD_DATA_FOLDER", "/data/harmony/harmony_db_0")
 	log.Println(fmt.Sprintf("Syncing with dir: %s", dir))
 
 	shardNum := EitherEnvOrDefaultInt("SHARD_NUMBER", 0)
