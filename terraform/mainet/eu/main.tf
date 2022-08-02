@@ -59,11 +59,11 @@ module "elastic" {
   redis_version         = "redis6.x"
   shard_conf = [{
     shard_number                  = 0
-    redis_shards                  = 2
+    redis_shards                  = 3
     redis_replicas_per_node_group = 1
     redis_instance_type           = "cache.r6g.large"
     other_supported_domains_http = [
-      #"api.harmony.one",
+      "api.harmony.one",
       "curve.s0.t.hmny.io",
       "sushi-archival.s0.t.hmny.io",
       "api.s0.t.hmny.io",
