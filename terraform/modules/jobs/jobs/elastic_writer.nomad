@@ -47,9 +47,9 @@ job "erpc-writer-${shard}" {
       }
 
       resources {
-        cpu = 4500
-        memory = 3500
-        memory_max = 3600
+        cpu = ${cpu}
+        memory = ${memory}
+        memory_max = ${memory_max}
       }
 
       template {

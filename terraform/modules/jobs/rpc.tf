@@ -31,6 +31,9 @@ resource "nomad_job" "elastic_writer" {
     redis_addr         = each.value.redis_addr
     boot_nodes         = var.boot_nodes
     network_type       = var.network
+    cpu                = each.value.writer_cpu
+    memory             = each.value.writer_memory
+    memory_max         = each.value.writer_memory + 300
     is_cluster_public  = var.is_cluster_public
     dns_port           = var.dns_init_port + each.key
     p2p_port           = var.p2p_init_port + each.key
