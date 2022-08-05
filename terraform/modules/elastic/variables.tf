@@ -11,12 +11,12 @@ variable "redis_version" { default = "redis6.x" }
 
 variable "shard_conf" {
   type = list(object({
-    shard_number                  = number
-    redis_shards                  = number
-    redis_replicas_per_node_group = number
-    redis_instance_type           = string
-    writer_cpu                    = number
-    writer_memory                 = number
+    shard_number             = number
+    redis_shards             = number
+    redis_replicas_per_shard = number
+    redis_instance_type      = string
+    writer_cpu               = number
+    writer_memory            = number
     # if the domains are subdomains of the root domain the default script will support them
     # if they belong to another hosting zone it'll try to import an exisiting certificate
     other_supported_domains_http = list(string)

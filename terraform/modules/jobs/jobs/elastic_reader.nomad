@@ -157,7 +157,7 @@ Version = "2.5.1"
   StateDBCacheSizeInMB = 1024
   StateDBCachePersistencePath = "alloc/data/fastcache"
   StateDBRedisServerAddr = ["${redis_addr}"]
-  StateDBRedisLRUTimeInDay = 201
+  StateDBRedisLRUTimeInDay = 10
 
 [HTTP]
   AuthPort = {{ env "NOMAD_PORT_http_auth" }}
@@ -167,6 +167,7 @@ Version = "2.5.1"
   RosettaEnabled = false
 
 [Log]
+  Console = true
   FileName = "1.stdharmony.0"
   Folder = "alloc/logs"
   RotateCount = 3

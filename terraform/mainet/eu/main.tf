@@ -58,12 +58,12 @@ module "elastic" {
   tkiv_data_node_number = local.tkiv_node_number
   redis_version         = "redis6.x"
   shard_conf = [{
-    shard_number                  = 0
-    redis_shards                  = 3
-    redis_replicas_per_node_group = 1
-    redis_instance_type           = "cache.r6g.large"
-    writer_cpu                    = 6000
-    writer_memory                 = 3800
+    shard_number             = 0
+    redis_shards             = 3
+    redis_replicas_per_shard = 1
+    redis_instance_type      = "cache.r6g.4xlarge"
+    writer_cpu               = 6200
+    writer_memory            = 4400
     other_supported_domains_http = [
       "api.harmony.one",
       "curve.s0.t.hmny.io",
@@ -83,12 +83,12 @@ module "elastic" {
     ]
     },
     {
-      shard_number                  = 1
-      redis_shards                  = 1
-      redis_replicas_per_node_group = 1
-      redis_instance_type           = "cache.r6g.large"
-      writer_cpu                    = 2800
-      writer_memory                 = 800
+      shard_number             = 1
+      redis_shards             = 1
+      redis_replicas_per_shard = 1
+      redis_instance_type      = "cache.r6g.large"
+      writer_cpu               = 2800
+      writer_memory            = 800
       other_supported_domains_http = [
         "api.s1.t.hmny.io",
         "a.api.s1.t.hmny.io",

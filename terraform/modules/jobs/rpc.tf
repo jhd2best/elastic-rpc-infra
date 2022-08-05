@@ -1,5 +1,5 @@
 locals {
-  harmony_binary_path = "elastic_rpc_cluster/bin/harmony"
+  harmony_binary_path = "v7575-v4.3.12-17-g3cdd9cfa/static/harmony"
   random_number       = 2341 # this is to force an update on all rpc jobs
 }
 

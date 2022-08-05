@@ -6,9 +6,9 @@ variable "subnets" { default = [] }
 
 variable "shard_conf" {
   type = list(object({
-    shard_number                  = number
-    redis_shards                  = number
-    redis_replicas_per_node_group = number
-    redis_instance_type           = string
+    shard_number             = number
+    redis_shards             = number
+    redis_replicas_per_shard = number
+    redis_instance_type      = string
   }))
 }
