@@ -72,38 +72,6 @@ EOF
 
       template {
         data = <<EOF
-scaling "memory_low" {
-  enabled = true
-  min     = ${client_min_nodes}
-  max     = ${client_max_nodes}
-
-  policy {
-    cooldown            = "3m"
-    evaluation_interval = "1m"
-    on_check_error      = "fail"
-
-    check "low_memory_usage" {
-      source = "prometheus"
-      query  = "sum(nomad_client_allocated_memory*100/(nomad_client_unallocated_memory+nomad_client_allocated_memory))/count(nomad_client_allocated_memory)"
-
-      strategy "threshold" {
-        upper_bound = ${client_low_memory_target}
-        lower_bound = 0
-
-        # ...remove one instance.
-        delta = -1
-      }
-    }
-
-    target "aws-asg" {
-      dry-run             = "false"
-      aws_asg_name        = "${client_asg_name}"
-      node_class          = "${client_node_class}"
-      node_drain_deadline = "5m"
-      node_selector_strategy = "least_busy"
-    }
-  }
-}
 
 scaling "cpu_low" {
   enabled = true
@@ -138,7 +106,7 @@ scaling "cpu_low" {
   }
 }
 
-scaling "metrics_high" {
+scaling "cpu_high" {
   enabled = true
   min     = ${client_min_nodes}
   max     = ${client_max_nodes}
@@ -155,19 +123,6 @@ scaling "metrics_high" {
       strategy "threshold" {
         upper_bound = 100
         lower_bound = ${client_high_cpu_target}
-
-        # ...add one instance.
-        delta = 1
-      }
-    }
-
-    check "high_memory_usage" {
-      source = "prometheus"
-      query  = "sum(nomad_client_allocated_memory*100/(nomad_client_unallocated_memory+nomad_client_allocated_memory))/count(nomad_client_allocated_memory)"
-
-      strategy "threshold" {
-        upper_bound = 100
-        lower_bound = ${client_high_memory_target}
 
         # ...add one instance.
         delta = 1
@@ -214,7 +169,7 @@ EOF
         data = <<EOH
 ---
 global:
-  scrape_interval: 30s
+  scrape_interval: 60s
   scrape_timeout:  5s
   external_labels:
     env : ${env}
@@ -278,7 +233,7 @@ EOH
 
       resources {
         cpu    = 200
-        memory = 200
+        memory = 300
       }
 
       driver = "exec"

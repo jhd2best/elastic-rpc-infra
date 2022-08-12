@@ -3,20 +3,20 @@ job "erpc-reader-${shard}" {
 
   group "erpc-reader-${shard}" {
     scaling {
-      min = 9
+      min = 1
       max = 30
       enabled = true
 
       policy {
-        evaluation_interval = "20s"
+        evaluation_interval = "1m"
         cooldown = "1m"
 
         check "cpu_utilization_low" {
           source = "prometheus"
-          query = "sum(nomad_client_allocs_cpu_total_ticks{task='erpc-reader'}*100/nomad_client_allocs_cpu_allocated{task='erpc-reader'})/count(nomad_client_allocs_cpu_allocated{task='erpc-reader'})"
+          query = "sum(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}*100/nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
 
           strategy "threshold" {
-            upper_bound = 50
+            upper_bound = 45
             lower_bound = 0
             delta       = -1
           }
@@ -24,34 +24,12 @@ job "erpc-reader-${shard}" {
 
         check "cpu_utilization_high" {
           source = "prometheus"
-          query = "sum(nomad_client_allocs_cpu_total_ticks{task='erpc-reader'}*100/nomad_client_allocs_cpu_allocated{task='erpc-reader'})/count(nomad_client_allocs_cpu_allocated{task='erpc-reader'})"
+          query = "sum(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}*100/nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
 
           strategy "threshold" {
             upper_bound = 100
             lower_bound = 70
-            delta       = 3
-          }
-        }
-
-        check "memory_utilization_low" {
-          source = "prometheus"
-          query = "sum(nomad_client_allocs_memory_rss{task='erpc-reader'}*100/nomad_client_allocs_memory_allocated{task='erpc-reader'})/count(nomad_client_allocs_memory_allocated{task='erpc-reader'})"
-
-          strategy "threshold" {
-            upper_bound = 50
-            lower_bound = 0
-            delta       = -1
-          }
-        }
-
-        check "memory_utilization_high" {
-          source = "prometheus"
-          query = "sum(nomad_client_allocs_memory_rss{task='erpc-reader'}*100/nomad_client_allocs_memory_allocated{task='erpc-reader'})/count(nomad_client_allocs_memory_allocated{task='erpc-reader'})"
-
-          strategy "threshold" {
-            upper_bound = 100
-            lower_bound = 70
-            delta       = 1
+            delta       = 2
           }
         }
       }
@@ -75,6 +53,12 @@ job "erpc-reader-${shard}" {
       port "p2p" {}
     }
 
+    restart {
+      attempts = 3
+      delay    = "10s"
+      interval = "10m"
+      mode     = "delay"
+    }
 
     task "erpc-reader-${shard}" {
       driver = "exec"
@@ -157,7 +141,7 @@ Version = "2.5.1"
   StateDBCacheSizeInMB = 1024
   StateDBCachePersistencePath = "alloc/data/fastcache"
   StateDBRedisServerAddr = ["${redis_addr}"]
-  StateDBRedisLRUTimeInDay = 10
+  StateDBRedisLRUTimeInDay = 30
 
 [HTTP]
   AuthPort = {{ env "NOMAD_PORT_http_auth" }}
@@ -261,7 +245,13 @@ EOH
               port     = "http_auth"
               path     = "/metrics"
               interval = "15s"
-              timeout  = "2s"
+              timeout  = "5s"
+
+              check_restart {
+                limit = 3
+                grace = "90s"
+                ignore_warnings = false
+              }
           }
           meta {
             port = "$${NOMAD_PORT_http_auth}"

@@ -4,7 +4,7 @@ job "erpc-writer-${shard}" {
   group "erpc-writer-${shard}" {
     count = 2
     update {
-      max_parallel = 2
+      max_parallel = 1
       min_healthy_time = "30s"
       healthy_deadline = "2m"
     }
@@ -98,7 +98,7 @@ Version = "2.5.1"
   StateDBCacheSizeInMB = 1024
   StateDBCachePersistencePath = "local/fastcache"
   StateDBRedisServerAddr = ["${redis_addr}"]
-  StateDBRedisLRUTimeInDay = 10
+  StateDBRedisLRUTimeInDay = 30
 
 [HTTP]
   AuthPort = {{ env "NOMAD_PORT_http_auth" }}
@@ -204,6 +204,12 @@ EOH
               path     = "/metrics"
               interval = "15s"
               timeout  = "2s"
+
+              check_restart {
+                limit = 3
+                grace = "90s"
+                ignore_warnings = false
+              }
           }
           meta {
             port = "$${NOMAD_PORT_http_auth}"

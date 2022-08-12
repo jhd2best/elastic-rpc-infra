@@ -1,6 +1,6 @@
 locals {
   autoscaler_version = "0.3.6"
-  min_instances = 2
+  min_instances      = 2
 }
 
 resource "nomad_job" "fabio" {

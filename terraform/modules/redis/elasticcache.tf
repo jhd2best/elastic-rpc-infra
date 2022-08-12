@@ -9,7 +9,7 @@ resource "aws_elasticache_replication_group" "redis_shard" {
   description                = "elastic cluster for shard ${each.key}"
   node_type                  = each.value.redis_instance_type
   port                       = local.redis_port
-  apply_immediately          = true # this has to be false because that way any changes will be applied in the next maintenance window
+  apply_immediately          = false # this has to be false because that way any changes will be applied in the next maintenance window
   auto_minor_version_upgrade = true
   maintenance_window         = "tue:06:30-tue:07:30"
   num_node_groups            = each.value.redis_shards
