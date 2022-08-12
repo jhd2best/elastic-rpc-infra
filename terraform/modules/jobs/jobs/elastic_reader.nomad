@@ -3,7 +3,7 @@ job "erpc-reader-${shard}" {
 
   group "erpc-reader-${shard}" {
     scaling {
-      min = 1
+      min = 2
       max = 30
       enabled = true
 
@@ -13,7 +13,7 @@ job "erpc-reader-${shard}" {
 
         check "cpu_utilization_low" {
           source = "prometheus"
-          query = "sum(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}*100/nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
+          query = "sum(sum_over_time(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}[190s])*100/sum_over_time(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'}[190s]))/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
 
           strategy "threshold" {
             upper_bound = 45
@@ -24,12 +24,12 @@ job "erpc-reader-${shard}" {
 
         check "cpu_utilization_high" {
           source = "prometheus"
-          query = "sum(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}*100/nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
+          query = "sum(sum_over_time(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}[190s])*100/sum_over_time(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'}[190s]))/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
 
           strategy "threshold" {
             upper_bound = 100
             lower_bound = 70
-            delta       = 2
+            delta       = 1
           }
         }
       }
@@ -37,6 +37,7 @@ job "erpc-reader-${shard}" {
 
     update {
       max_parallel = 2
+      healthy_deadline = "80s"
       min_healthy_time = "30s"
       healthy_deadline = "2m"
     }
@@ -57,7 +58,7 @@ job "erpc-reader-${shard}" {
       attempts = 3
       delay    = "10s"
       interval = "10m"
-      mode     = "delay"
+      mode     = "fail"
     }
 
     task "erpc-reader-${shard}" {
@@ -90,9 +91,9 @@ job "erpc-reader-${shard}" {
       }
 
       resources {
-        cpu = 14000
-        memory = 8000
-        memory_max = 8500
+        cpu = 16800
+        memory = 9600
+        memory_max = 9900
       }
 
       template {
@@ -248,7 +249,7 @@ EOH
               timeout  = "5s"
 
               check_restart {
-                limit = 3
+                limit = 1
                 grace = "90s"
                 ignore_warnings = false
               }
