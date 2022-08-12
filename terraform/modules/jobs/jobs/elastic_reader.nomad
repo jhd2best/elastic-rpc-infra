@@ -3,7 +3,7 @@ job "erpc-reader-${shard}" {
 
   group "erpc-reader-${shard}" {
     scaling {
-      min = 1
+      min = 9
       max = 30
       enabled = true
 
@@ -29,7 +29,7 @@ job "erpc-reader-${shard}" {
           strategy "threshold" {
             upper_bound = 100
             lower_bound = 70
-            delta       = 1
+            delta       = 3
           }
         }
 
@@ -106,9 +106,9 @@ job "erpc-reader-${shard}" {
       }
 
       resources {
-        cpu = 7000
-        memory = 4000
-        memory_max = 5000
+        cpu = 14000
+        memory = 8000
+        memory_max = 8500
       }
 
       template {

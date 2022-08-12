@@ -14,8 +14,9 @@ job "fabio" {
       }
 
       resources {
-        cpu    = 200
-        memory = 128
+        cpu    = 1800
+        memory = 928
+        memory_max = 1500
         network {
           mbits = 20
           port "lb" {

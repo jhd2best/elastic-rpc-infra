@@ -92,14 +92,15 @@ func main() {
 		http.ListenAndServe(":8649", nil)
 	}()
 
-	//instance, err := compare.NewLevelDBInstance("/data/harmony_db_0")
-	//if err != nil {
-	//	panic(err)
-	//}
-	//defer instance.Close()
-
-	dir := EitherEnvOrDefault("SHARD_DATA_FOLDER", "/data/harmony/harmony_db_0")
+	dir := EitherEnvOrDefault("DB_FOLDER", "/data/harmony/harmony_db_0")
 	log.Println(fmt.Sprintf("Syncing with dir: %s", dir))
+
+	instance, err := compare.NewLevelDBInstance(dir)
+	if err != nil {
+		fmt.Println("unable to open leveldb instance", err)
+		return
+	}
+	defer instance.Close()
 
 	shardNum := EitherEnvOrDefaultInt("SHARD_NUMBER", 0)
 	log.Println(fmt.Sprintf("Syncing with shard: %d", shardNum))
@@ -107,10 +108,10 @@ func main() {
 	tkivUrl := EitherEnvOrDefault("PD_HOST_PORT", "127:0.0.1:2379")
 	log.Println(fmt.Sprintf("Syncing with tikv: %s", tkivUrl))
 
-	instance := buildMultiDB(dir, 8, 4)
-	defer instance.Close()
+	//instance := buildMultiDB(dir, 8, 4)
+	//defer instance.Close()
 
-	prefixStr := []byte(fmt.Sprintf("harmony_tikv_%d/", shardNum))
+	prefixStr := []byte(fmt.Sprintf("explorer_tikv_%d/", shardNum))
 	kvInstance, err := compare.NewTiKVInstance([]string{tkivUrl}, prefixStr)
 	if err != nil {
 		panic(err)

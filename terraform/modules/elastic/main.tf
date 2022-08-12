@@ -22,7 +22,7 @@ locals {
     {
       id             = "client"
       instance_type  = var.instance_type
-      instance_count = { min : 1, max : 15, desired : 1 },
+      instance_count = { min : 1, max : 15, desired : 2 },
       security_groups = [                                                                                             # this groups are open to the whole world so used them with caution
         { protocol : "icmp", from_port : 8, to_port : 0 },                                                            # enough to enable ping
         { protocol : "tcp", from_port : local.dnsInitPort, to_port : local.dnsInitPort + local.maxShards },           # open ports for upto 8 shards

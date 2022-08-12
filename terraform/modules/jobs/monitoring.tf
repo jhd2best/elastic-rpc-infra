@@ -1,5 +1,6 @@
 locals {
   autoscaler_version = "0.3.6"
+  min_instances = 2
 }
 
 resource "nomad_job" "fabio" {
@@ -17,7 +18,7 @@ resource "nomad_job" "prom_autoscaler" {
     client_node_class         = each.key
     autoscaler_version        = local.autoscaler_version
     client_max_nodes          = each.value.instance_count.max
-    client_min_nodes          = 2
+    client_min_nodes          = local.min_instances
     token                     = var.nomad.nomad_master_token
     client_low_memory_target  = var.low_memory_target
     client_high_memory_target = var.high_memory_target

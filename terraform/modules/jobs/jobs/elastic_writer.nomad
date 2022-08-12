@@ -1,8 +1,8 @@
 job "erpc-writer-${shard}" {
   datacenters = ["dc1"]
-  type = "system"
 
   group "erpc-writer-${shard}" {
+    count = 2
     update {
       max_parallel = 2
       min_healthy_time = "30s"

@@ -75,6 +75,10 @@ resource "aws_instance" "pd_tiup" {
   }
 
   depends_on = [aws_instance.data_normal, aws_instance.pd_normal]
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
 
 data "template_file" "user_data_pd_normal" {
@@ -105,6 +109,10 @@ resource "aws_instance" "pd_normal" {
   }
 
   user_data = data.template_file.user_data_pd_normal.rendered
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
 
 data "template_file" "user_data_normal" {
@@ -135,4 +143,9 @@ resource "aws_instance" "data_normal" {
   }
 
   user_data = data.template_file.user_data_normal.rendered
+
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
