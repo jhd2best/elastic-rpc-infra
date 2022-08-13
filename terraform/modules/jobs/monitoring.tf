@@ -1,5 +1,5 @@
 locals {
-  autoscaler_version = "0.3.6"
+  autoscaler_version = "0.3.7"
   min_instances      = 2
 }
 

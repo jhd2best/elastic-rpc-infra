@@ -32,7 +32,7 @@ job "prometheus-autoscaler" {
           "-policy-dir",
           "$${NOMAD_TASK_DIR}/policies/",
           "-log-level",
-          "INFO" // Switch to TRACE for debugging purposes.
+          "TRACE" // Switch to TRACE for debugging purposes.
         ]
       }
 

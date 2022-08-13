@@ -5,7 +5,7 @@ job "erpc-writer-${shard}" {
     count = 2
     update {
       max_parallel = 1
-      min_healthy_time = "30s"
+      min_healthy_time = "60s"
       healthy_deadline = "2m"
     }
 
@@ -24,15 +24,18 @@ job "erpc-writer-${shard}" {
 
 
     task "erpc-writer-${shard}" {
-      driver = "exec"
+      driver = "docker"
 
       logs {
         max_files     = 3
         max_file_size = 5
       }
+
       config {
+        image = "diego1q2w/harmony:amd"
         command = "harmony"
-        args = ["--config", "local/config.cfg"]
+        args = ["--config", "/local/config.cfg"]
+        ports = ["wss_auth", "http_auth", "http", "wss", "metrics", "pprof", "dnssync", "p2p", "explorer"]
       }
 
       env {
@@ -63,7 +66,7 @@ Version = "2.5.1"
   KMSConfigFile = ""
   KMSConfigSrcType = "shared"
   KMSEnabled = false
-  KeyDir = "local/.hmy/blskeys"
+  KeyDir = "/local/.hmy/blskeys"
   KeyFiles = []
   MaxKeys = 10
   PassEnabled = true
@@ -80,7 +83,7 @@ Version = "2.5.1"
   Zone = "t.hmny.io"
 
 [General]
-  DataDir = "local"
+  DataDir = "/local"
   EnablePruneBeaconChain = false
   IsArchival = true
   IsBackup = false
@@ -96,7 +99,7 @@ Version = "2.5.1"
   PDAddr = ${tkiv_addr}
   Role = "Writer"
   StateDBCacheSizeInMB = 1024
-  StateDBCachePersistencePath = "local/fastcache"
+  StateDBCachePersistencePath = "/local/fastcache"
   StateDBRedisServerAddr = ["${redis_addr}"]
   StateDBRedisLRUTimeInDay = 30
 
@@ -125,13 +128,13 @@ Version = "2.5.1"
 [P2P]
   DiscConcurrency = 0
   IP = "0.0.0.0"
-  KeyFile = "local/.hmykey"
+  KeyFile = "/local/.hmykey"
   MaxConnsPerIP = 10
   Port = {{ env "NOMAD_PORT_p2p" }}
 
 [Pprof]
   Enabled = true
-  Folder = "local/profiles"
+  Folder = "/local/profiles"
   ListenAddr = "0.0.0.0:{{ env "NOMAD_PORT_pprof" }}"
   ProfileDebugValues = [0]
   ProfileIntervals = [600]
@@ -165,7 +168,7 @@ Version = "2.5.1"
 
 [TxPool]
   AccountSlots = 16
-  BlacklistFile = "local/blacklist.txt"
+  BlacklistFile = "/local/blacklist.txt"
   RosettaFixFile = ""
 
 [WS]

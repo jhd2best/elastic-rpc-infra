@@ -12,7 +12,7 @@ variable "explorer_init_port" {}
 variable "high_cpu_target" {
   description = "High CPU % threshold for the cluster autoscaling"
   type        = number
-  default     = 70
+  default     = 80
 }
 variable "low_cpu_target" {
   description = "Low CPU % threshold for the cluster autoscaling"

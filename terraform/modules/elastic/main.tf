@@ -9,7 +9,7 @@ terraform {
 locals {
   is_cluster_public = false # use this for maintenance purposes only like syncying the tkiv from another region
   maxShards         = 8
-  dnsInitPort       = 7000
+  dnsInitPort       = 6000
   p2pInitPort       = 9000
   explorerInitPort  = 5000 # this is 4000 ports bellow the p2p port https://github.com/harmony-one/harmony/blob/main/api/service/explorer/service.go#L31
   groups = [
