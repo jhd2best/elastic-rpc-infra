@@ -37,9 +37,8 @@ job "erpc-reader-${shard}" {
 
     update {
       max_parallel = 2
-      healthy_deadline = "80s"
-      min_healthy_time = "30s"
-      healthy_deadline = "2m"
+      min_healthy_time = "10s"
+      healthy_deadline = "1m"
     }
 
     network {
@@ -62,7 +61,7 @@ job "erpc-reader-${shard}" {
     }
 
     task "erpc-reader-${shard}" {
-      driver = "exec"
+      driver = "docker"
 
       logs {
         max_files     = 3
@@ -70,8 +69,10 @@ job "erpc-reader-${shard}" {
       }
 
       config {
+        image = "diego1q2w/harmony:amd"
         command = "harmony"
-        args = ["--config", "local/config.cfg"]
+        args = ["--config", "/local/config.cfg"]
+        ports = ["wss_auth", "http_auth", "http", "wss", "metrics", "pprof", "dnssync", "p2p"]
       }
 
       env {
@@ -107,7 +108,7 @@ Version = "2.5.1"
   KMSConfigFile = ""
   KMSConfigSrcType = "shared"
   KMSEnabled = false
-  KeyDir = "local/.hmy/blskeys"
+  KeyDir = "/local/.hmy/blskeys"
   KeyFiles = []
   MaxKeys = 10
   PassEnabled = true
@@ -124,7 +125,7 @@ Version = "2.5.1"
   Zone = "t.hmny.io"
 
 [General]
-  DataDir = "local"
+  DataDir = "/local"
   EnablePruneBeaconChain = false
   IsArchival = true
   IsBackup = false
@@ -140,7 +141,7 @@ Version = "2.5.1"
   PDAddr = ${tkiv_addr}
   Role = "Reader"
   StateDBCacheSizeInMB = 1024
-  StateDBCachePersistencePath = "alloc/data/fastcache"
+  StateDBCachePersistencePath = "/local/fastcache"
   StateDBRedisServerAddr = ["${redis_addr}"]
   StateDBRedisLRUTimeInDay = 30
 
@@ -169,13 +170,13 @@ Version = "2.5.1"
 [P2P]
   DiscConcurrency = 0
   IP = "0.0.0.0"
-  KeyFile = "local/.hmykey"
+  KeyFile = "/local/.hmykey"
   MaxConnsPerIP = 10
   Port = {{ env "NOMAD_PORT_p2p" }}
 
 [Pprof]
   Enabled = true
-  Folder = "local/profiles"
+  Folder = "/local/profiles"
   ListenAddr = "0.0.0.0:{{ env "NOMAD_PORT_pprof" }}"
   ProfileDebugValues = [0]
   ProfileIntervals = [600]
@@ -209,7 +210,7 @@ Version = "2.5.1"
 
 [TxPool]
   AccountSlots = 16
-  BlacklistFile = "local/blacklist.txt"
+  BlacklistFile = "/local/blacklist.txt"
   RosettaFixFile = ""
 
 [WS]
