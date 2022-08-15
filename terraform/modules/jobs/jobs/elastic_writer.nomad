@@ -227,7 +227,7 @@ EOH
 
               check_restart {
                 limit = 3
-                grace = "90s"
+                grace = "120s"
                 ignore_warnings = false
               }
           }

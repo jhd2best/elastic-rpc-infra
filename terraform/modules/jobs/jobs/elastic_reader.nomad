@@ -14,15 +14,15 @@ job "erpc-reader-${shard}" {
 
       policy {
         evaluation_interval = "1m"
-        cooldown = "3m"
+        cooldown = "5m"
 
         check "cpu_utilization" {
           source = "prometheus"
           query = "sum(sum_over_time(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}[190s])*100/sum_over_time(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'}[190s]))/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
 
           strategy "target-value" {
-            target    = 70
-            threshold = 0.3
+            target    = 80
+            threshold = 0.25
           }
         }
       }
