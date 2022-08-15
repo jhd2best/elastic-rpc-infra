@@ -22,13 +22,26 @@ job "erpc-writer-${shard}" {
       port "explorer" { static = ${explorer_init_port} }
     }
 
+    volume "fastcache" {
+      type      = "host"
+      source    = "fastcache_data"
+      read_only = false
+    }
 
     task "erpc-writer-${shard}" {
       driver = "docker"
 
+      kill_timeout = "90s" ## maximum 180s
+
       logs {
         max_files     = 3
         max_file_size = 5
+      }
+
+      volume_mount {
+        volume      = "fastcache"
+        destination = "/fastcache"
+        read_only = false
       }
 
       config {
@@ -98,8 +111,8 @@ Version = "2.5.1"
   Debug = false
   PDAddr = ${tkiv_addr}
   Role = "Writer"
-  StateDBCacheSizeInMB = 1024
-  StateDBCachePersistencePath = "/local/fastcache"
+  StateDBCacheSizeInMB = 10240
+  StateDBCachePersistencePath = "/fastcache/s${shard}"
   StateDBRedisServerAddr = ["${redis_addr}"]
   StateDBRedisLRUTimeInDay = 30
 
@@ -116,7 +129,7 @@ Version = "2.5.1"
   Folder = "alloc/logs"
   RotateCount = 3
   RotateMaxAge = 1
-  RotateSize = 30
+  RotateSize = 31
   Verbosity = 3
   [Log.VerbosePrints]
     Config = true

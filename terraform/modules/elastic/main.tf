@@ -115,8 +115,6 @@ module "jobs" {
       tkiv_pd_addrs                = module.tkiv.tkiv_pd_urls
       other_supported_domains_http = bd.other_supported_domains_http
       other_supported_domains_wss  = bd.other_supported_domains_wss
-      writer_memory                = bd.writer_memory
-      writer_cpu                   = bd.writer_cpu
     }
   ]
 

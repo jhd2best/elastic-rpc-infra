@@ -1,6 +1,8 @@
 locals {
   harmony_binary_path = "v7575-v4.3.12-17-g3cdd9cfa/static/harmony"
-  random_number       = 2341 # this is to force an update on all rpc jobs
+  random_number       = 2341  # this is to force an update on all rpc jobs
+  writer_cpu          = 30600 // MHz
+  writer_memory       = 17500 // MB
 }
 
 resource "nomad_job" "elastic_reader" {
@@ -31,9 +33,9 @@ resource "nomad_job" "elastic_writer" {
     redis_addr         = each.value.redis_addr
     boot_nodes         = var.boot_nodes
     network_type       = var.network
-    cpu                = each.value.writer_cpu
-    memory             = each.value.writer_memory
-    memory_max         = each.value.writer_memory + 300
+    cpu                = local.writer_cpu
+    memory             = local.writer_memory
+    memory_max         = local.writer_memory + 300
     is_cluster_public  = var.is_cluster_public
     dns_port           = var.dns_init_port + each.key
     p2p_port           = var.p2p_init_port + each.key

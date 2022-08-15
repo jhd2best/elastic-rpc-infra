@@ -62,8 +62,6 @@ module "elastic" {
     redis_shards             = 3
     redis_replicas_per_shard = 1
     redis_instance_type      = "cache.r6g.4xlarge"
-    writer_cpu               = 28000
-    writer_memory            = 16000
     other_supported_domains_http = [
       "api.harmony.one",
       "a.api.s0.t.hmny.io",
@@ -88,8 +86,6 @@ module "elastic" {
       redis_shards             = 1
       redis_replicas_per_shard = 1
       redis_instance_type      = "cache.r6g.large"
-      writer_cpu               = 2800
-      writer_memory            = 800
       other_supported_domains_http = [
         "api.s1.t.hmny.io",
         "a.api.s1.t.hmny.io",

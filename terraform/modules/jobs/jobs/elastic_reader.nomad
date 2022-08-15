@@ -3,7 +3,7 @@ job "erpc-reader-${shard}" {
 
   group "erpc-reader-${shard}" {
     scaling {
-      min = 2
+      min = 1
       max = 30
       enabled = true
 
@@ -11,25 +11,13 @@ job "erpc-reader-${shard}" {
         evaluation_interval = "1m"
         cooldown = "1m"
 
-        check "cpu_utilization_low" {
+        check "cpu_utilization" {
           source = "prometheus"
           query = "sum(sum_over_time(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}[190s])*100/sum_over_time(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'}[190s]))/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
 
-          strategy "threshold" {
-            upper_bound = 45
-            lower_bound = 0
-            delta       = -1
-          }
-        }
-
-        check "cpu_utilization_high" {
-          source = "prometheus"
-          query = "sum(sum_over_time(nomad_client_allocs_cpu_total_ticks{task='erpc-reader-${shard}'}[190s])*100/sum_over_time(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'}[190s]))/count(nomad_client_allocs_cpu_allocated{task='erpc-reader-${shard}'})"
-
-          strategy "threshold" {
-            upper_bound = 100
-            lower_bound = 70
-            delta       = 1
+          strategy "target-value" {
+            target    = 70
+            threshold = 5
           }
         }
       }
@@ -62,6 +50,8 @@ job "erpc-reader-${shard}" {
 
     task "erpc-reader-${shard}" {
       driver = "docker"
+
+      shutdown_delay = "7s"
 
       logs {
         max_files     = 3
@@ -140,7 +130,7 @@ Version = "2.5.1"
   Debug = false
   PDAddr = ${tkiv_addr}
   Role = "Reader"
-  StateDBCacheSizeInMB = 1024
+  StateDBCacheSizeInMB = 224
   StateDBCachePersistencePath = "/local/fastcache"
   StateDBRedisServerAddr = ["${redis_addr}"]
   StateDBRedisLRUTimeInDay = 30

@@ -22,8 +22,6 @@ variable "low_cpu_target" {
 
 variable "shard_config" {
   type = list(object({
-    writer_cpu                   = number
-    writer_memory                = number
     shard_number                 = number
     shard_http_endpoint          = string
     shard_wss_endpoint           = string

@@ -65,6 +65,10 @@ target "aws-asg" {
 strategy "threshold" {
   driver = "threshold"
 }
+
+strategy "target-value" {
+  driver = "target-value"
+}
 EOF
 
         destination = "$${NOMAD_TASK_DIR}/config.hcl"
@@ -112,7 +116,7 @@ scaling "cpu_high" {
   max     = ${client_max_nodes}
 
   policy {
-    cooldown            = "3m"
+    cooldown            = "4m"
     evaluation_interval = "1m"
     on_check_error      = "fail"
 

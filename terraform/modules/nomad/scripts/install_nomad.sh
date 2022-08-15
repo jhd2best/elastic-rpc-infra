@@ -22,6 +22,11 @@ function install_nomad {
     mkdir -p /opt/nomad/promtail
     chown promtail_user:promtail_user /opt/nomad/promtail
     chmod 700 /opt/nomad/promtail
+#   fastcache setup https://learn.hashicorp.com/tutorials/nomad/exec-users-host-volumes?in=nomad/stateful-workloads
+    useradd -M -U fastcache_user
+    mkdir -p /opt/nomad/fastcache
+    chown fastcache_user:fastcache_user /opt/nomad/fastcache
+    chmod 700 /opt/nomad/fastcache
 }
 
 function install_nomad_service {
@@ -98,6 +103,7 @@ function create_nomad_client_config {
     cat <<EOF > /etc/nomad.d/client.hcl
 client {
     enabled = true
+    max_kill_timeout = "180s"
     node_class = "${group_id}"
     meta {
         group_id = "${group_id}"
@@ -108,9 +114,13 @@ client {
     host_volume "nomad_data" {
       path      = "/opt/nomad/alloc"
       read_only = true
-  }
+    }
    host_volume "promtail_data" {
       path      = "/opt/nomad/promtail"
+      read_only = false
+  }
+   host_volume "fastcache_data" {
+      path      = "/opt/nomad/fastcache"
       read_only = false
   }
 }
