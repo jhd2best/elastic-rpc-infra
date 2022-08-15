@@ -2,6 +2,11 @@ job "prometheus-autoscaler" {
   datacenters = ["dc1"]
   type        = "service"
 
+  constraint {
+    attribute = "$${node.class}"
+    value     = "client"
+  }
+
   group "prometheus-autoscaler" {
     count = 1
 
@@ -89,7 +94,7 @@ scaling "cpu_low" {
 
     check "low_cpu_usage" {
       source = "prometheus"
-      query  = "sum(nomad_client_allocated_cpu*100/(nomad_client_unallocated_cpu+nomad_client_allocated_cpu))/count(nomad_client_allocated_cpu)"
+      query  = "sum(nomad_client_allocated_cpu{node_class='${client_node_class}'}*100/(nomad_client_unallocated_cpu{node_class='${client_node_class}'}+nomad_client_allocated_cpu{node_class='${client_node_class}'}))/count(nomad_client_allocated_cpu{node_class='${client_node_class}'})"
 
       strategy "threshold" {
         upper_bound = ${client_low_cpu_target}
@@ -122,7 +127,7 @@ scaling "cpu_high" {
 
     check "high_cpu_usage" {
       source = "prometheus"
-      query  = "sum(nomad_client_allocated_cpu*100/(nomad_client_unallocated_cpu+nomad_client_allocated_cpu))/count(nomad_client_allocated_cpu)"
+      query  = "sum(nomad_client_allocated_cpu{node_class='${client_node_class}'}*100/(nomad_client_unallocated_cpu{node_class='${client_node_class}'}+nomad_client_allocated_cpu{node_class='${client_node_class}'}))/count(nomad_client_allocated_cpu{node_class='${client_node_class}'})"
 
       strategy "threshold" {
         upper_bound = 100

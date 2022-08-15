@@ -23,6 +23,7 @@ variable "low_cpu_target" {
 variable "shard_config" {
   type = list(object({
     shard_number                 = number
+    num_writers                  = number
     shard_http_endpoint          = string
     shard_wss_endpoint           = string
     redis_addr                   = string

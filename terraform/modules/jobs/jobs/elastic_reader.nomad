@@ -1,6 +1,11 @@
 job "erpc-reader-${shard}" {
   datacenters = ["dc1"]
 
+  constraint {
+    attribute = "$${node.class}"
+    value     = "client"
+  }
+
   group "erpc-reader-${shard}" {
     scaling {
       min = 1
@@ -52,6 +57,7 @@ job "erpc-reader-${shard}" {
       driver = "docker"
 
       shutdown_delay = "7s"
+      kill_timeout = "120s"
 
       logs {
         max_files     = 3
@@ -82,9 +88,9 @@ job "erpc-reader-${shard}" {
       }
 
       resources {
-        cpu = 16800
-        memory = 9600
-        memory_max = 9900
+        cpu = 24500
+        memory = 14100
+        memory_max = 14300
       }
 
       template {
@@ -130,10 +136,10 @@ Version = "2.5.1"
   Debug = false
   PDAddr = ${tkiv_addr}
   Role = "Reader"
-  StateDBCacheSizeInMB = 224
+  StateDBCacheSizeInMB = 1024
   StateDBCachePersistencePath = "/local/fastcache"
   StateDBRedisServerAddr = ["${redis_addr}"]
-  StateDBRedisLRUTimeInDay = 30
+  StateDBRedisLRUTimeInDay = 365
 
 [HTTP]
   AuthPort = {{ env "NOMAD_PORT_http_auth" }}

@@ -8,7 +8,7 @@ resource "nomad_job" "fabio" {
 }
 
 resource "nomad_job" "prom_autoscaler" {
-  for_each = { for g in try(var.nomad.cluster_groups, []) : g.id => g if g.id == "client" }
+  for_each = { for g in try(var.nomad.cluster_groups, []) : g.id => g if g.id == "client" } // only client scales up and down
   jobspec = templatefile("${path.module}/jobs/prom_autoscaler.nomad", {
     # Prometheus
     env    = var.env

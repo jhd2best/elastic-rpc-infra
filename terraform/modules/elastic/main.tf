@@ -8,10 +8,10 @@ terraform {
 
 locals {
   is_cluster_public = false # use this for maintenance purposes only like syncying the tkiv from another region
-  maxShards         = 8
   dnsInitPort       = 6000
   p2pInitPort       = 9000
   explorerInitPort  = 5000 # this is 4000 ports bellow the p2p port https://github.com/harmony-one/harmony/blob/main/api/service/explorer/service.go#L31
+  numOfWorkers      = sum([for g in var.shard_conf : g.num_writers])
   groups = [
     {
       id              = "server"
@@ -20,15 +20,22 @@ locals {
       security_groups = []
     },
     {
-      id             = "client"
-      instance_type  = var.instance_type
-      instance_count = { min : 1, max : 15, desired : 2 },
-      security_groups = [                                                                                             # this groups are open to the whole world so used them with caution
-        { protocol : "icmp", from_port : 8, to_port : 0 },                                                            # enough to enable ping
-        { protocol : "tcp", from_port : local.dnsInitPort, to_port : local.dnsInitPort + local.maxShards },           # open ports for upto 8 shards
-        { protocol : "tcp", from_port : local.p2pInitPort, to_port : local.p2pInitPort + local.maxShards },           # open ports for upto 8 shards
-        { protocol : "tcp", from_port : local.explorerInitPort, to_port : local.explorerInitPort + local.maxShards }, # open ports for upto 8 shards
+      id             = "writer"
+      instance_type  = "m5.2xlarge"
+      instance_count = { min : local.numOfWorkers, max : local.numOfWorkers, desired : local.numOfWorkers }
+      security_groups = [
+        # this groups are open to the whole world so used them with caution
+        { protocol : "icmp", from_port : 8, to_port : 0 },                                          # enough to enable ping
+        { protocol : "tcp", from_port : local.dnsInitPort, to_port : local.dnsInitPort },           # open ports for upto 8 shards
+        { protocol : "tcp", from_port : local.p2pInitPort, to_port : local.p2pInitPort },           # open ports for upto 8 shards
+        { protocol : "tcp", from_port : local.explorerInitPort, to_port : local.explorerInitPort }, # open ports for upto 8 shards
       ]
+    },
+    {
+      id              = "client"
+      instance_type   = var.instance_type
+      instance_count  = { min : 1, max : 15, desired : 2 },
+      security_groups = []
     }
   ]
   project    = "elastic-rpc"
@@ -111,6 +118,7 @@ module "jobs" {
       shard_wss_endpoint           = "ws${bd.shard_number}.${local.domain}"
       shard_http_endpoint          = "api${bd.shard_number}.${local.domain}"
       shard_number                 = bd.shard_number
+      num_writers                  = bd.num_writers
       redis_addr                   = "${module.redis.shard_addresses[bd.shard_number]}:${module.redis.shard_ports[bd.shard_number]}"
       tkiv_pd_addrs                = module.tkiv.tkiv_pd_urls
       other_supported_domains_http = bd.other_supported_domains_http

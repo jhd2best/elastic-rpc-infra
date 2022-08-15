@@ -1,8 +1,13 @@
 job "erpc-writer-${shard}" {
   datacenters = ["dc1"]
 
+  constraint {
+    attribute = "$${node.class}"
+    value     = "writer"
+  }
+
   group "erpc-writer-${shard}" {
-    count = 2
+    count = ${count}
     update {
       max_parallel = 1
       min_healthy_time = "60s"
@@ -29,7 +34,8 @@ job "erpc-writer-${shard}" {
     }
 
     task "erpc-writer-${shard}" {
-      driver = "docker"
+      driver = "exec"
+      user = "fastcache_user"
 
       kill_timeout = "180s" ## maximum 300s
 
@@ -45,10 +51,8 @@ job "erpc-writer-${shard}" {
       }
 
       config {
-        image = "diego1q2w/harmony:amd"
         command = "harmony"
         args = ["--config", "/local/config.cfg"]
-        ports = ["wss_auth", "http_auth", "http", "wss", "metrics", "pprof", "dnssync", "p2p", "explorer"]
       }
 
       env {
@@ -114,7 +118,7 @@ Version = "2.5.1"
   StateDBCacheSizeInMB = 10240
   StateDBCachePersistencePath = "/fastcache/s${shard}"
   StateDBRedisServerAddr = ["${redis_addr}"]
-  StateDBRedisLRUTimeInDay = 30
+  StateDBRedisLRUTimeInDay = 365
 
 [HTTP]
   AuthPort = {{ env "NOMAD_PORT_http_auth" }}

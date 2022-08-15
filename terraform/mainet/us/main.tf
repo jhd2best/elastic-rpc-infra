@@ -61,6 +61,7 @@ module "elastic" {
     shard_number             = 0
     redis_shards             = 2
     redis_replicas_per_shard = 1
+    num_writers              = 2
     redis_instance_type      = "cache.r6g.4xlarge"
     other_supported_domains_http = [
       "api.harmony.one",
