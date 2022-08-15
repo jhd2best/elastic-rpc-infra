@@ -181,8 +181,7 @@ global:
   scrape_interval: 60s
   scrape_timeout:  5s
   external_labels:
-    env : ${env}
-    region : ${region}
+    cluster : erpc-${env}-${region}
 
 scrape_configs:
 #  - job_name: 'prometheus'

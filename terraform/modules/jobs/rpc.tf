@@ -1,5 +1,5 @@
 locals {
-  harmony_binary_path = "v7575-v4.3.12-17-g3cdd9cfa/static/harmony"
+  harmony_binary_path = "v7578-v4.3.12-20-g4dfeb837/static/harmony"
   random_number       = 2341  # this is to force an update on all rpc jobs
   writer_cpu          = 20600 // MHz
   writer_memory       = 28000 // MB

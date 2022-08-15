@@ -45,8 +45,7 @@ positions:
 client:
   url: https://{{ key "consul/users/loki" }}:{{ key "consul/tokens/grafana-publisher" }}@logs-prod3.grafana.net/loki/api/v1/push
   external_labels:
-    env : ${env}
-    region : ${region}
+    cluster : erpc-${env}-${region}
 
 server:
   http_listen_port: 0
