@@ -8,7 +8,7 @@ job "erpc-reader-${shard}" {
 
   group "erpc-reader-${shard}" {
     scaling {
-      min = 1
+      min = 2
       max = 30
       enabled = true
 
@@ -29,7 +29,7 @@ job "erpc-reader-${shard}" {
     }
 
     update {
-      max_parallel = 2
+      max_parallel = 1
       min_healthy_time = "10s"
       healthy_deadline = "1m"
     }
