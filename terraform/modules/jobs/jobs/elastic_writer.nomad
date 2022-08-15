@@ -31,7 +31,7 @@ job "erpc-writer-${shard}" {
     task "erpc-writer-${shard}" {
       driver = "docker"
 
-      kill_timeout = "90s" ## maximum 180s
+      kill_timeout = "180s" ## maximum 300s
 
       logs {
         max_files     = 3

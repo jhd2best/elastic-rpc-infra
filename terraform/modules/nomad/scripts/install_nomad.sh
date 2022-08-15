@@ -103,7 +103,7 @@ function create_nomad_client_config {
     cat <<EOF > /etc/nomad.d/client.hcl
 client {
     enabled = true
-    max_kill_timeout = "180s"
+    max_kill_timeout = "360s"
     node_class = "${group_id}"
     meta {
         group_id = "${group_id}"

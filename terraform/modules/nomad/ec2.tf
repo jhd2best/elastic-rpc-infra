@@ -65,7 +65,7 @@ resource "aws_launch_configuration" "group" {
   security_groups             = concat([aws_security_group.ec2.id, local.default_security_group_id], [aws_security_group.open[each.key].id])
   # depends_on                  = [aws_iam_role_policy_attachment.nomad]
   root_block_device {
-    volume_size = each.key != "server" ? 50 : 30
+    volume_size           = each.key != "server" ? 50 : 30
     delete_on_termination = true
   }
   lifecycle {
