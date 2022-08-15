@@ -14,7 +14,7 @@ job "erpc-reader-${shard}" {
 
       policy {
         evaluation_interval = "1m"
-        cooldown = "1m"
+        cooldown = "3m"
 
         check "cpu_utilization" {
           source = "prometheus"
@@ -22,7 +22,7 @@ job "erpc-reader-${shard}" {
 
           strategy "target-value" {
             target    = 70
-            threshold = 5
+            threshold = 0.3
           }
         }
       }
