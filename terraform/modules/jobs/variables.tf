@@ -5,6 +5,7 @@ variable "nomad" {}
 variable "is_cluster_public" { type = bool }
 
 variable "boot_nodes" {}
+variable "dns_zone" { type = string }
 variable "dns_init_port" {}
 variable "p2p_init_port" {}
 variable "explorer_init_port" {}

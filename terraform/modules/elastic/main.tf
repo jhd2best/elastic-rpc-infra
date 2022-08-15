@@ -113,6 +113,7 @@ module "jobs" {
   region            = var.region
   boot_nodes        = var.boot_nodes
   is_cluster_public = local.is_cluster_public
+  dns_zone          = local.rootDomain
   shard_config = [
     for k, bd in var.shard_conf : {
       shard_wss_endpoint           = "ws${bd.shard_number}.${local.domain}"

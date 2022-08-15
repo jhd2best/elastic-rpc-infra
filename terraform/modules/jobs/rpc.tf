@@ -9,6 +9,7 @@ resource "nomad_job" "elastic_reader" {
   for_each = { for g in try(var.shard_config, []) : g.shard_number => g }
   jobspec = templatefile("${path.module}/jobs/elastic_reader.nomad", {
     shard             = each.key
+    dns_zone          = var.dns_zone
     binary_path       = local.harmony_binary_path
     random_number     = local.random_number
     tkiv_addr         = "[\"${join("\", \"", each.value.tkiv_pd_addrs)}\"]"
@@ -28,6 +29,7 @@ resource "nomad_job" "elastic_writer" {
   jobspec = templatefile("${path.module}/jobs/elastic_writer.nomad", {
     shard              = each.key
     count              = each.value.num_writers
+    dns_zone           = var.dns_zone
     binary_path        = local.harmony_binary_path
     random_number      = local.random_number
     tkiv_addr          = "[\"${join("\", \"", each.value.tkiv_pd_addrs)}\"]"

@@ -13,7 +13,7 @@ locals {
   env              = "main"                         # change this if new region or env launched # this is used for namespacing so it can be a short version
   network          = "mainnet"                      # change this if new region or env launched # this is used for node configuration
   boot_nodes       = "/dnsaddr/bootstrap.t.hmny.io" # change this if new region or env launched
-  domain           = "t.hmny.io"                    #hosting zone
+  domain           = "t.hmny.io"                    # hosting zone also used as dnszone
   vpc_index        = 52                             # used to namespace the vpc cdir number, in the case when having multiple clusters in different regions all of them will have a different cidr block
   tkiv_node_number = 13                             # number of nodes for the tkiv cluster to launch
 }

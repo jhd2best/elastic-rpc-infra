@@ -118,7 +118,7 @@ Version = "2.5.1"
   Port = {{ env "NOMAD_PORT_dnssync" }}
   Server = true
   ServerPort = {{ env "NOMAD_PORT_dnssync" }}
-  Zone = "t.hmny.io"
+  Zone = "${dns_zone}"
 
 [General]
   DataDir = "/local"
