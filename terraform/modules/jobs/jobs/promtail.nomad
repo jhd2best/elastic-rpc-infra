@@ -29,8 +29,8 @@ job "promtail" {
       user = "promtail_user"
 
       resources {
-        cpu    = 120
-        memory = 80
+        cpu    = 250
+        memory = 130
       }
 
       template {

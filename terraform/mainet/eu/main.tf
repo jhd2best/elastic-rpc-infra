@@ -80,6 +80,7 @@ module "elastic" {
       "wss.internal.s0.t.hmny.io",
       "ws.internal.s0.t.hmny.io",
       "ws.s0.t.hmny.io",
+      "a.ws.s0.t.hmny.io",
     ]
     },
     {

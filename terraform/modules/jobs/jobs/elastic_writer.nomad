@@ -223,7 +223,7 @@ EOH
               port     = "http_auth"
               path     = "/metrics"
               interval = "15s"
-              timeout  = "2s"
+              timeout  = "5s"
 
               check_restart {
                 limit = 3

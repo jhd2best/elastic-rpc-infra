@@ -22,7 +22,7 @@ job "erpc-reader-${shard}" {
 
           strategy "target-value" {
             target    = 80
-            threshold = 0.25
+            threshold = 0.2
           }
         }
       }
@@ -247,7 +247,7 @@ EOH
 
               check_restart {
                 limit = 1
-                grace = "90s"
+                grace = "60s"
                 ignore_warnings = false
               }
           }
