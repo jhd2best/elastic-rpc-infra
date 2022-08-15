@@ -2,7 +2,7 @@ locals {
   harmony_binary_path = "v7575-v4.3.12-17-g3cdd9cfa/static/harmony"
   random_number       = 2341  # this is to force an update on all rpc jobs
   writer_cpu          = 20600 // MHz
-  writer_memory       = 29500 // MB
+  writer_memory       = 28000 // MB
 }
 
 resource "nomad_job" "elastic_reader" {
