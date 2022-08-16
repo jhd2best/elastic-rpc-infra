@@ -67,10 +67,19 @@ resource "aws_instance" "pd_tiup" {
   provisioner "remote-exec" {
     inline = [
       "chmod +x /home/ubuntu/init.sh && sudo /home/ubuntu/init.sh",
-      "curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh",
+
+      "wget https://download.pingcap.org/tidb-${var.cluster_version}-linux-amd64.tar.gz", // Download pd tools
+      "tar -zxvf tidb-${var.cluster_version}-linux-amd64.tar.gz",
+      "rm -f tidb-${var.cluster_version}-linux-amd64.tar.gz",
+      "sudo mv tidb-${var.cluster_version}-linux-amd64/bin/* /usr/local/bin/",
+      "rm -rf tidb-${var.cluster_version}-linux-amd64/",
+
+      "curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh", // Download tiup
       "export PATH=/home/ubuntu/.tiup/bin:$PATH",
       "tiup cluster",
       "tiup --binary cluster",
+      "pd-ctl config show",
+      "echo 'export PATH=/home/ubuntu/.tiup/bin:$PATH' >>~/.profile",
     ]
   }
 
@@ -109,6 +118,8 @@ resource "aws_instance" "pd_normal" {
   }
 
   user_data = data.template_file.user_data_pd_normal.rendered
+
+  depends_on = [aws_instance.data_normal]
 
   lifecycle {
     ignore_changes = [ami]

@@ -29,18 +29,11 @@ locals {
     private_ip : local.pd_private_ips[num]
     }
   }
-  data_domains = { for num in range(var.tkiv_data_node_number) : "data${num}.tikv.${var.domain}" => {
-    public_ip : local.data_public_ips[num]
-    private_ip : local.data_private_ips[num]
-    }
-  }
 
-  pd_domain = "pd.${var.domain}"
+  pd_domain = "pd.tkiv.${var.domain}"
 }
 
 resource "null_resource" "launch_tikv" {
-  count = 1
-
   connection {
     host        = local.pd_tiup_public_ip
     type        = "ssh"
@@ -58,7 +51,7 @@ resource "null_resource" "launch_tikv" {
     content = templatefile("${path.module}/files/topology.yaml.tftpl", {
       pd_tiup_host   = aws_instance.pd_tiup.private_ip,
       pd_hosts       = [for domain, ips in local.pd_domains : domain],
-      data_hosts     = [for domain, ips in local.data_domains : domain],
+      data_hosts     = local.data_private_ips,
       replicas_count = var.tkiv_replication_factor,
     })
     destination = "/home/ubuntu/topology.yaml"
@@ -66,7 +59,7 @@ resource "null_resource" "launch_tikv" {
 
   provisioner "remote-exec" {
     inline = [
-      "sleep 20",
+      "sleep 40",
       "export PATH=/home/ubuntu/.tiup/bin:$PATH",
       "tiup cluster check ./topology.yaml --apply --user tikv",
       "tiup cluster deploy ${var.cluster_name} ${var.cluster_version} ./topology.yaml --user tikv -y",
@@ -77,5 +70,28 @@ resource "null_resource" "launch_tikv" {
     ]
   }
 
-  depends_on = [aws_route53_record.domain_data, aws_route53_record.domain_pd, aws_route53_record.domain_pds]
+  depends_on = [aws_route53_record.domain_pd, aws_route53_record.domain_pds]
+}
+
+resource "null_resource" "set_tkiv_parameters" {
+  connection {
+    host        = local.pd_tiup_public_ip
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = trimspace(tls_private_key.tikv_nodes.private_key_pem)
+    agent       = false
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sleep 10",
+      "pd-ctl config set low-space-ratio 0.9",
+      "pd-ctl config set high-space-ratio 0.8",
+      "pd-ctl config set hot-region-schedule-limit 16",
+      "pd-ctl config set leader-schedule-limit 15",
+      "pd-ctl config set merge-schedule-limit 16",
+    ]
+  }
+
+  depends_on = [null_resource.launch_tikv]
 }

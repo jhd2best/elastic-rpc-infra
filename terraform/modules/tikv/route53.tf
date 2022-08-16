@@ -18,15 +18,3 @@ resource "aws_route53_record" "domain_pds" {
 
   depends_on = [aws_instance.pd_tiup, aws_instance.pd_normal]
 }
-
-
-resource "aws_route53_record" "domain_data" {
-  for_each = local.data_domains
-  zone_id  = var.zone_id
-  name     = each.key
-  type     = "A"
-  ttl      = 60
-  records  = [var.is_cluster_public ? each.value.public_ip : each.value.private_ip]
-
-  depends_on = [aws_instance.data_normal]
-}

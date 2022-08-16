@@ -85,12 +85,15 @@ module "nomad" {
 module "tkiv" {
   source                = "../tikv"
   domain                = local.domain
-  subnets_ids           = aws_subnet.public.*.id
+  subnets_ids           = [aws_subnet.public[0].id]
   vpc_id                = aws_vpc.vpc.id
   zone_id               = var.web_zone_id
   cluster_name          = local.cluster_id
   is_cluster_public     = local.is_cluster_public
   tkiv_data_node_number = var.tkiv_data_node_number
+  tkiv_pd_node_number   = 3
+
+  depends_on = [aws_subnet.public]
 }
 
 module "redis" {
