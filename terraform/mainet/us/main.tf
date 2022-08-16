@@ -61,7 +61,7 @@ module "elastic" {
     shard_number             = 0
     redis_shards             = 2
     redis_replicas_per_shard = 1
-    num_writers              = 2
+    num_writers              = 0
     min_num_readers          = 1
     redis_instance_type      = "cache.r6g.large"
     other_supported_domains_http = [
