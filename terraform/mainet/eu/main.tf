@@ -63,6 +63,7 @@ module "elastic" {
     redis_replicas_per_shard = 1
     redis_instance_type      = "cache.r6g.4xlarge"
     num_writers              = 2
+    min_num_readers          = 5
     other_supported_domains_http = [
       "api.harmony.one",
       "a.api.s0.t.hmny.io",
@@ -89,6 +90,7 @@ module "elastic" {
       redis_replicas_per_shard = 1
       redis_instance_type      = "cache.r6g.large"
       num_writers              = 1
+      min_num_readers          = 1
       other_supported_domains_http = [
         "api.s1.t.hmny.io",
         "a.api.s1.t.hmny.io",

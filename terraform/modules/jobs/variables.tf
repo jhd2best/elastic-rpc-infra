@@ -13,18 +13,19 @@ variable "explorer_init_port" {}
 variable "high_cpu_target" {
   description = "High CPU % threshold for the cluster autoscaling"
   type        = number
-  default     = 80
+  default     = 85
 }
 variable "low_cpu_target" {
   description = "Low CPU % threshold for the cluster autoscaling"
   type        = number
-  default     = 45
+  default     = 57
 }
 
 variable "shard_config" {
   type = list(object({
     shard_number                 = number
     num_writers                  = number
+    min_num_readers              = number
     shard_http_endpoint          = string
     shard_wss_endpoint           = string
     redis_addr                   = string

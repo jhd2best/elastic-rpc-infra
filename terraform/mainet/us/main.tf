@@ -62,24 +62,26 @@ module "elastic" {
     redis_shards             = 2
     redis_replicas_per_shard = 1
     num_writers              = 2
-    redis_instance_type      = "cache.r6g.4xlarge"
+    min_num_readers          = 1
+    redis_instance_type      = "cache.r6g.large"
     other_supported_domains_http = [
-      "api.harmony.one",
-      "a.api.s0.t.hmny.io",
-      "curve.s0.t.hmny.io",
-      "sushi-archival.s0.t.hmny.io",
-      "api.s0.t.hmny.io",
-      "rpc.s0.t.hmny.io",
-      "thegraph.s0.t.hmny.io",
-      "bridge.api.s0.t.hmny.io",
-      "rosetta.s0.t.hmny.io",
-      "btc.api.s0.t.hmny.io",
-      "partners.s0.t.hmny.io",
+      #      "api.harmony.one",
+      #      "a.api.s0.t.hmny.io",
+      #      "curve.s0.t.hmny.io",
+      #      "sushi-archival.s0.t.hmny.io",
+      #      "api.s0.t.hmny.io",
+      #      "rpc.s0.t.hmny.io",
+      #      "thegraph.s0.t.hmny.io",
+      #      "bridge.api.s0.t.hmny.io",
+      #      "rosetta.s0.t.hmny.io",
+      #      "btc.api.s0.t.hmny.io",
+      #      "partners.s0.t.hmny.io",
     ]
     other_supported_domains_wss = [
-      "wss.internal.s0.t.hmny.io",
-      "ws.internal.s0.t.hmny.io",
-      "ws.s0.t.hmny.io",
+      #      "wss.internal.s0.t.hmny.io",
+      #      "ws.internal.s0.t.hmny.io",
+      #      "ws.s0.t.hmny.io",
+      #      "a.ws.s0.t.hmny.io",
     ]
     },
   ]

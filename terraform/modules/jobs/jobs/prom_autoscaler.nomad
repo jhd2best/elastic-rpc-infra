@@ -89,7 +89,7 @@ scaling "cpu_low" {
 
   policy {
     cooldown            = "5m"
-    evaluation_interval = "1m"
+    evaluation_interval = "5m"
     on_check_error      = "fail"
 
     check "low_cpu_usage" {
@@ -101,7 +101,7 @@ scaling "cpu_low" {
         lower_bound = 0
 
         # ...remove one instance.
-        delta = -1
+        percentage = -33.34
       }
     }
 
@@ -121,7 +121,7 @@ scaling "cpu_high" {
   max     = ${client_max_nodes}
 
   policy {
-    cooldown            = "4m"
+    cooldown            = "3m"
     evaluation_interval = "1m"
     on_check_error      = "fail"
 

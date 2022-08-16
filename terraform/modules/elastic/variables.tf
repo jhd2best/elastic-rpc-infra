@@ -15,6 +15,7 @@ variable "shard_conf" {
     redis_shards             = number
     redis_replicas_per_shard = number
     num_writers              = number
+    min_num_readers          = number
     redis_instance_type      = string
     # if the domains are subdomains of the root domain the default script will support them
     # if they belong to another hosting zone it'll try to import an exisiting certificate
