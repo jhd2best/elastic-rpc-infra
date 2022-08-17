@@ -30,7 +30,7 @@ func main() {
 	defer kvInstance.Close()
 	op := EitherEnvOrDefault("OPERATION", "get")
 	log.Println(fmt.Sprintf("Operation: %s", op))
-	key := EitherEnvOrDefault("KEY", "get")
+	key := EitherEnvOrDefault("KEY", "checkpoint_bitmap")
 	log.Println(fmt.Sprintf("Key: %s", key))
 
 	if op == "get" {

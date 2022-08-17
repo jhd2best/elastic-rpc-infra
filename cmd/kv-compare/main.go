@@ -24,6 +24,7 @@ import (
 
 const (
 	safePointKey = "kv-compare-safe-point"
+	tikvPrefix   = "harmony_tikv"
 )
 
 var shardIdxKey = []byte("__DB_SHARED_INDEX__")
@@ -91,9 +92,17 @@ func main() {
 	go func() {
 		http.ListenAndServe(":8649", nil)
 	}()
+	shardNum := EitherEnvOrDefaultInt("SHARD_NUMBER", 0)
+	log.Println(fmt.Sprintf("Syncing for shard: %d", shardNum))
+
+	tkivUrl := EitherEnvOrDefault("PD_HOST_PORT", "127:0.0.1:2379")
+	log.Println(fmt.Sprintf("Syncing to tikv: %s", tkivUrl))
+
+	prefixStr := fmt.Sprintf("%s_%d/", tikvPrefix, shardNum)
+	log.Println(fmt.Sprintf("Syncing to tikv prefix: %s", prefixStr))
 
 	dir := EitherEnvOrDefault("DB_FOLDER", "/data/harmony/harmony_db_0")
-	log.Println(fmt.Sprintf("Syncing with dir: %s", dir))
+	log.Println(fmt.Sprintf("Syncing from dir: %s", dir))
 
 	instance, err := compare.NewLevelDBInstance(dir)
 	if err != nil {
@@ -102,17 +111,10 @@ func main() {
 	}
 	defer instance.Close()
 
-	shardNum := EitherEnvOrDefaultInt("SHARD_NUMBER", 0)
-	log.Println(fmt.Sprintf("Syncing with shard: %d", shardNum))
-
-	tkivUrl := EitherEnvOrDefault("PD_HOST_PORT", "127:0.0.1:2379")
-	log.Println(fmt.Sprintf("Syncing with tikv: %s", tkivUrl))
-
 	//instance := buildMultiDB(dir, 8, 4)
 	//defer instance.Close()
 
-	prefixStr := []byte(fmt.Sprintf("harmony_tikv_%d/", shardNum))
-	kvInstance, err := compare.NewTiKVInstance([]string{tkivUrl}, prefixStr)
+	kvInstance, err := compare.NewTiKVInstance([]string{tkivUrl}, []byte(prefixStr))
 	if err != nil {
 		panic(err)
 	}
