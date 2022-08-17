@@ -111,7 +111,7 @@ func main() {
 	//instance := buildMultiDB(dir, 8, 4)
 	//defer instance.Close()
 
-	prefixStr := []byte(fmt.Sprintf("explorer_tikv_%d/", shardNum))
+	prefixStr := []byte(fmt.Sprintf("harmony_tikv_%d/", shardNum))
 	kvInstance, err := compare.NewTiKVInstance([]string{tkivUrl}, prefixStr)
 	if err != nil {
 		panic(err)
