@@ -1,4 +1,4 @@
-job "erpc-reader-${shard}" {
+job "erpc-reader-s${shard}" {
   datacenters = ["dc1"]
 
   constraint {
@@ -6,7 +6,7 @@ job "erpc-reader-${shard}" {
     value     = "client"
   }
 
-  group "erpc-reader-${shard}" {
+  group "erpc-reader-s${shard}" {
     scaling {
       min = ${min}
       max = 30
@@ -53,7 +53,7 @@ job "erpc-reader-${shard}" {
       mode     = "fail"
     }
 
-    task "erpc-reader-${shard}" {
+    task "erpc-reader-s${shard}" {
       driver = "docker"
 
       shutdown_delay = "7s"
@@ -76,7 +76,7 @@ job "erpc-reader-${shard}" {
         // If redis is empty, the hit rate will be too low and the synchronization block speed will be slow
         // set LOAD_PRE_FETCH to yes can significantly improve this.
         // run this the setting [TKIV] Debug = true
-        // LOAD_PRE_FETCH = "yes"
+        LOAD_PRE_FETCH = "yes"
         IS_CLUSTER_PUBLIC_ECHO = "${is_cluster_public}"
         random_number = "${random_number}"
       }
@@ -133,13 +133,13 @@ Version = "2.5.1"
   RunElasticMode = true
 
 [TiKV]
-  Debug = false
+  Debug = true
   PDAddr = ${tkiv_addr}
   Role = "Reader"
   StateDBCacheSizeInMB = 1024
   StateDBCachePersistencePath = "/local/fastcache"
   StateDBRedisServerAddr = ["${redis_addr}"]
-  StateDBRedisLRUTimeInDay = 365
+  StateDBRedisLRUTimeInDay = 35
 
 [HTTP]
   AuthPort = {{ env "NOMAD_PORT_http_auth" }}

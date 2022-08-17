@@ -83,7 +83,7 @@ resource "aws_autoscaling_group" "group" {
   max_size             = each.value.instance_count.max
   min_size             = each.value.instance_count.min
   health_check_type    = "ELB"
-  vpc_zone_identifier  = local.subnet_ids
+  vpc_zone_identifier  = length(each.value.subnets_ids) > 0 ? each.value.subnets_ids : local.subnet_ids
   // protect_from_scale_in = true
   // force_delete          = true
   tag {

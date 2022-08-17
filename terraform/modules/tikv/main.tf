@@ -30,7 +30,7 @@ locals {
     }
   }
 
-  pd_domain = "pd.tkiv.${var.domain}"
+  pd_domain = "pd.tikv.${var.domain}"
 }
 
 resource "null_resource" "launch_tikv" {

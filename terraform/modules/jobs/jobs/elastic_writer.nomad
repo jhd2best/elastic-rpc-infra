@@ -1,4 +1,4 @@
-job "erpc-writer-${shard}" {
+job "erpc-writer-s${shard}" {
   datacenters = ["dc1"]
 
   constraint {
@@ -6,7 +6,7 @@ job "erpc-writer-${shard}" {
     value     = "writer"
   }
 
-  group "erpc-writer-${shard}" {
+  group "erpc-writer-s${shard}" {
     count = ${count}
     update {
       max_parallel = 1
@@ -33,7 +33,7 @@ job "erpc-writer-${shard}" {
       read_only = false
     }
 
-    task "erpc-writer-${shard}" {
+    task "erpc-writer-s${shard}" {
       driver = "exec"
       user = "fastcache_user"
 
@@ -118,7 +118,7 @@ Version = "2.5.1"
   StateDBCacheSizeInMB = 10240
   StateDBCachePersistencePath = "/fastcache/s${shard}"
   StateDBRedisServerAddr = ["${redis_addr}"]
-  StateDBRedisLRUTimeInDay = 365
+  StateDBRedisLRUTimeInDay = 35
 
 [HTTP]
   AuthPort = {{ env "NOMAD_PORT_http_auth" }}

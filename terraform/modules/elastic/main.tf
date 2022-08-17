@@ -12,17 +12,20 @@ locals {
   p2pInitPort       = 9000
   explorerInitPort  = 5000 # this is 4000 ports bellow the p2p port https://github.com/harmony-one/harmony/blob/main/api/service/explorer/service.go#L31
   numOfWorkers      = sum([for g in var.shard_conf : g.num_writers])
+  tikvSubnets       = [aws_subnet.public[0].id]
   groups = [
     {
       id              = "server"
       instance_type   = "t3.micro"
       instance_count  = { min : 3, max : 3, desired : 3 }
       security_groups = []
+      subnets_ids     = []
     },
     {
       id             = "writer"
       instance_type  = "m5.2xlarge"
       instance_count = { min : local.numOfWorkers, max : local.numOfWorkers, desired : local.numOfWorkers }
+      subnets_ids    = local.tikvSubnets
       security_groups = [
         # this groups are open to the whole world so used them with caution
         { protocol : "icmp", from_port : 8, to_port : 0 },                                          # enough to enable ping
@@ -36,6 +39,7 @@ locals {
       instance_type   = var.instance_type
       instance_count  = { min : 1, max : 15, desired : 2 },
       security_groups = []
+      subnets_ids     = []
     }
   ]
   project    = "elastic-rpc"
@@ -85,7 +89,7 @@ module "nomad" {
 module "tkiv" {
   source                = "../tikv"
   domain                = local.domain
-  subnets_ids           = [aws_subnet.public[0].id]
+  subnets_ids           = local.tikvSubnets
   vpc_id                = aws_vpc.vpc.id
   zone_id               = var.web_zone_id
   cluster_name          = local.cluster_id

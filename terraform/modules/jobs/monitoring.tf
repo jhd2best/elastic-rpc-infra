@@ -1,6 +1,6 @@
 locals {
   autoscaler_version = "0.3.7"
-  min_instances      = max(1, ceil(sum([for g in var.shard_config: g.min_num_readers])/2))
+  min_instances      = max(1, ceil(sum([for g in var.shard_config : g.min_num_readers]) / 2))
 }
 
 resource "nomad_job" "fabio" {

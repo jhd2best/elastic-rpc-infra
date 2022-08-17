@@ -64,6 +64,13 @@ func (t *TiKVInstance) Add(key, val []byte) error {
 	return nil
 }
 
+func (t *TiKVInstance) Get(key []byte) ([]byte, error) {
+	t.lock.Lock()
+	defer t.lock.Unlock()
+
+	return t.db.Get(key)
+}
+
 func (t *TiKVInstance) Flush() error {
 	t.lock.Lock()
 	defer t.lock.Unlock()

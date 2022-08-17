@@ -15,6 +15,7 @@ variable "ssh_key_name" {
 variable "cluster_groups" {
   type = list(object({
     id              = string,
+    subnets_ids     = list(string), # the subnets we want to deploy this group into, if omitted then it wil use the value provided in public_subnet_ids
     instance_type   = string,
     instance_count  = object({ min : number, max : number, desired : number }),
     security_groups = list(object({ protocol : string, from_port : number, to_port : number }))
@@ -61,6 +62,7 @@ variable "vpc" {
 }
 
 variable "public_subnet_ids" {
+  type = list(string)
 }
 
 variable "zone_id" {

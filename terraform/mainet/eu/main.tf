@@ -59,7 +59,7 @@ module "elastic" {
   redis_version         = "redis6.x"
   shard_conf = [{
     shard_number             = 0
-    redis_shards             = 3
+    redis_shards             = 2
     redis_replicas_per_shard = 1
     redis_instance_type      = "cache.r6g.4xlarge"
     num_writers              = 2
