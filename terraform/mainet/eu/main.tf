@@ -84,7 +84,7 @@ module "elastic" {
         "ws.s0.t.hmny.io",
         "a.ws.s0.t.hmny.io",
       ]
-    }
+    },
   ]
 }
 

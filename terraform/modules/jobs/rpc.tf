@@ -6,7 +6,7 @@ locals {
 }
 
 resource "nomad_job" "elastic_reader" {
-  for_each = { for g in try(var.shard_config, []) : g.shard_number => g }
+  for_each = { for g in try(var.shard_config, []) : g.shard_number => g if g.min_num_readers > 0 }
   jobspec = templatefile("${path.module}/jobs/elastic_reader.nomad", {
     shard             = each.key
     min               = each.value.min_num_readers
@@ -26,7 +26,7 @@ resource "nomad_job" "elastic_reader" {
 }
 
 resource "nomad_job" "elastic_writer" {
-  for_each = { for g in try(var.shard_config, []) : g.shard_number => g }
+  for_each = { for g in try(var.shard_config, []) : g.shard_number => g if g.num_writers > 0 }
   jobspec = templatefile("${path.module}/jobs/elastic_writer.nomad", {
     shard              = each.key
     count              = each.value.num_writers

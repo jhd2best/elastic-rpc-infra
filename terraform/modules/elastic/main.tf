@@ -12,6 +12,7 @@ locals {
   p2pInitPort       = 9000
   explorerInitPort  = 5000 # this is 4000 ports bellow the p2p port https://github.com/harmony-one/harmony/blob/main/api/service/explorer/service.go#L31
   numOfWorkers      = sum([for g in var.shard_conf : g.num_writers])
+  numOfReaders      = sum([for g in var.shard_conf : g.min_num_readers])
   tikvSubnets       = [aws_subnet.public[0].id]
   groups = [
     {
@@ -37,7 +38,7 @@ locals {
     {
       id              = "client"
       instance_type   = var.instance_type
-      instance_count  = { min : 1, max : 15, desired : 2 },
+      instance_count  = { min : local.numOfReaders, max : 15, desired : local.numOfReaders },
       security_groups = []
       subnets_ids     = []
     }

@@ -29,7 +29,7 @@ job "erpc-reader-s${shard}" {
     }
 
     update {
-      max_parallel = 2
+      max_parallel = 1
       min_healthy_time = "10s"
       healthy_deadline = "1m"
     }
@@ -88,9 +88,9 @@ job "erpc-reader-s${shard}" {
       }
 
       resources {
-        cpu = 24500
-        memory = 14100
-        memory_max = 14300
+        cpu = 49000
+        memory = 28300
+        memory_max = 28500
       }
 
       template {
