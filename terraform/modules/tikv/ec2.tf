@@ -86,7 +86,7 @@ resource "aws_instance" "pd_tiup" {
   depends_on = [aws_instance.data_normal, aws_instance.pd_normal]
 
   lifecycle {
-    ignore_changes = [ami]
+    ignore_changes = [ami, subnet_id]
   }
 }
 
@@ -122,7 +122,7 @@ resource "aws_instance" "pd_normal" {
   depends_on = [aws_instance.data_normal]
 
   lifecycle {
-    ignore_changes = [ami]
+    ignore_changes = [ami, subnet_id]
   }
 }
 
@@ -157,6 +157,6 @@ resource "aws_instance" "data_normal" {
 
 
   lifecycle {
-    ignore_changes = [ami]
+    ignore_changes = [ami, subnet_id]
   }
 }

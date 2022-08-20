@@ -204,13 +204,35 @@ EOH
 
       service {
           name = "nolog-erpc-writer-metrics"
-          tags = ["erpc_writer", "enodetype=writer", "shard=${shard}"]
+          tags = ["erpc_writer", "urlprefix-/s${shard}/writer/metrics strip=/s${shard}/writer/metrics", "enodetype=writer", "shard=${shard}"]
           port = "metrics"
+
+          check {
+            type     = "http"
+            port     = "http_auth"
+            path     = "/metrics"
+            interval = "15s"
+            timeout  = "5s"
+          }
 
           meta {
             port = "$${NOMAD_PORT_metrics}"
             public_ip = "$${attr.unique.platform.aws.public-ipv4}"
             private_ip = "$${attr.unique.platform.aws.local-ipv4}"
+          }
+      }
+
+      service {
+          name = "nolog-erpc-writer-explorer"
+          tags = ["erpc_writer", "urlprefix-/s${shard}/writer/explorer strip=/s${shard}/writer/explorer"]
+          port = "explorer"
+
+          check {
+            type     = "http"
+            port     = "http_auth"
+            path     = "/metrics"
+            interval = "15s"
+            timeout  = "5s"
           }
       }
 

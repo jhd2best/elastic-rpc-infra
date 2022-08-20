@@ -76,7 +76,7 @@ job "erpc-reader-s${shard}" {
         // If redis is empty, the hit rate will be too low and the synchronization block speed will be slow
         // set LOAD_PRE_FETCH to yes can significantly improve this.
         // run this the setting [TKIV] Debug = true
-        LOAD_PRE_FETCH = "yes"
+        // LOAD_PRE_FETCH = "yes"
         IS_CLUSTER_PUBLIC_ECHO = "${is_cluster_public}"
         random_number = "${random_number}"
       }
@@ -133,7 +133,7 @@ Version = "2.5.1"
   RunElasticMode = true
 
 [TiKV]
-  Debug = true
+  Debug = false
   PDAddr = ${tkiv_addr}
   Role = "Reader"
   StateDBCacheSizeInMB = 1024
