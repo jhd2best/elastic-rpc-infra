@@ -63,7 +63,7 @@ module "elastic" {
       redis_shards             = 3
       redis_replicas_per_shard = 1
       redis_instance_type      = "cache.r6g.4xlarge"
-      num_writers              = 2
+      num_writers              = 1
       min_num_readers          = 1
       other_supported_domains_http = [
         #      "api.harmony.one",
@@ -107,4 +107,8 @@ module "elastic" {
 output "elastic" {
   value     = module.elastic
   sensitive = true
+}
+
+output "region" {
+  value = local.aws_region
 }

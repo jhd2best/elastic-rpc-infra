@@ -60,7 +60,7 @@ module "elastic" {
   shard_conf = [
     {
       shard_number             = 0
-      redis_shards             = 2
+      redis_shards             = 3
       redis_replicas_per_shard = 1
       redis_instance_type      = "cache.r6g.4xlarge"
       num_writers              = 2
@@ -91,4 +91,8 @@ module "elastic" {
 output "elastic" {
   value     = module.elastic
   sensitive = true
+}
+
+output "region" {
+  value = local.aws_region
 }

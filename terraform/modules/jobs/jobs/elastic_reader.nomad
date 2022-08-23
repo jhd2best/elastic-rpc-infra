@@ -46,6 +46,12 @@ job "erpc-reader-s${shard}" {
       port "p2p" {}
     }
 
+    volume "fastcache" {
+      type      = "host"
+      source    = "fastcache_data"
+      read_only = false
+    }
+
     restart {
       attempts = 3
       delay    = "10s"
@@ -69,6 +75,12 @@ job "erpc-reader-s${shard}" {
         command = "harmony"
         args = ["--config", "/local/config.cfg"]
         ports = ["wss_auth", "http_auth", "http", "wss", "metrics", "pprof", "dnssync", "p2p"]
+      }
+
+      volume_mount {
+        volume      = "fastcache"
+        destination = "/fastcache"
+        read_only = false
       }
 
       env {
@@ -133,11 +145,11 @@ Version = "2.5.1"
   RunElasticMode = true
 
 [TiKV]
-  Debug = false
+  Debug = true
   PDAddr = ${tkiv_addr}
   Role = "Reader"
-  StateDBCacheSizeInMB = 1024
-  StateDBCachePersistencePath = "/local/fastcache"
+  StateDBCacheSizeInMB = 6025
+  StateDBCachePersistencePath = "/fastcache/s${shard}"
   StateDBRedisServerAddr = ["${redis_addr}"]
   StateDBRedisLRUTimeInDay = 35
 
@@ -246,8 +258,8 @@ EOH
               timeout  = "5s"
 
               check_restart {
-                limit = 1
-                grace = "60s"
+                limit = 2
+                grace = "40s"
                 ignore_warnings = false
               }
           }
