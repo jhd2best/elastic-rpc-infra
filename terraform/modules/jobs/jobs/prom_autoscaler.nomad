@@ -240,8 +240,8 @@ EOH
       }
 
       resources {
-        cpu    = 200
-        memory = 400
+        cpu    = 300
+        memory = 600
       }
 
       driver = "exec"

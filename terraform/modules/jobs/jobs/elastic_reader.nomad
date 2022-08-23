@@ -101,8 +101,8 @@ job "erpc-reader-s${shard}" {
 
       resources {
         cpu = 49000
-        memory = 28300
-        memory_max = 28500
+        memory = 30000
+        memory_max = 30300
       }
 
       template {
