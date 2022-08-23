@@ -7,11 +7,15 @@ on:
         description: Harmony branch to build
         required: true
         default: main
+      owner:
+        description: Harmony branch to build
+        required: true
+        default: harmony-one
 
 jobs:
   check:
     name: Per-check for current tag
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     continue-on-error: false
     outputs:
       tag_annotated: ${{ steps.check-tag-annotated.outputs.tag_annotated }}
@@ -20,7 +24,7 @@ jobs:
       - name: Checkout harmony core code
         uses: actions/checkout@v2
         with:
-          repository: harmony-one/harmony
+          repository: ${{ github.event.inputs.owner }}/harmony
           path: harmony
           ref: ${{ github.event.inputs.branch }}
           fetch-depth: 0
@@ -43,7 +47,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-18.04 ]
+        os: [ ubuntu-20.04 ]
 
     steps:
       - name: Set up Go 1.18
@@ -66,7 +70,7 @@ jobs:
       - name: Checkout harmony core code
         uses: actions/checkout@v2
         with:
-          repository: harmony-one/harmony
+          repository: ${{ github.event.inputs.owner }}/harmony
           path: harmony
           ref: ${{ github.event.inputs.branch }}
           fetch-depth: 0
@@ -80,7 +84,7 @@ jobs:
         working-directory: harmony
 
       - name: Build harmony binary and packages for Linux
-        if: matrix.os == 'ubuntu-18.04'
+        if: matrix.os == 'ubuntu-20.04'
         run: |
           make linux_static
           mv ./bin/harmony ./bin/harmony-amd64
