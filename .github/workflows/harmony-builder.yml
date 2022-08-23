@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: Harmony branch to build
+        description: Repo owner
         required: true
         default: main
       owner:
-        description: Harmony branch to build
+        description: Repo branch
         required: true
         default: harmony-one
 
