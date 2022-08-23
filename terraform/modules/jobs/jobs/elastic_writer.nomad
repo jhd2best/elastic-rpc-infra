@@ -38,6 +38,7 @@ job "erpc-writer-s${shard}" {
       user = "fastcache_user"
 
       kill_timeout = "180s" ## maximum 300s
+      shutdown_delay = "2s"
 
       logs {
         max_files     = 3

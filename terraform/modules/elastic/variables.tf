@@ -6,7 +6,8 @@ variable "domain" {}
 variable "web_zone_id" {}
 variable "vpc_index" { default = 51 }
 variable "tkiv_data_node_number" { default = 3 }
-variable "instance_type" { default = "c5.4xlarge" }
+variable "client_instance_type" { default = "c5.4xlarge" }
+variable "writer_instance_type" { default = "m5.2xlarge" }
 variable "redis_version" { default = "redis6.x" }
 
 variable "shard_conf" {

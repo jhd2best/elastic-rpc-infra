@@ -167,7 +167,7 @@ Version = "2.5.1"
   RotateCount = 3
   RotateMaxAge = 1
   RotateSize = 30
-  Verbosity = 3
+  Verbosity = 2
   [Log.VerbosePrints]
     Config = true
 

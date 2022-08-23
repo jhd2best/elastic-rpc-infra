@@ -24,7 +24,7 @@ locals {
     },
     {
       id             = "writer"
-      instance_type  = "m5.2xlarge"
+      instance_type  = var.writer_instance_type
       instance_count = { min : local.numOfWorkers, max : local.numOfWorkers, desired : local.numOfWorkers }
       subnets_ids    = local.tikvSubnets
       security_groups = [
@@ -37,7 +37,7 @@ locals {
     },
     {
       id              = "client"
-      instance_type   = var.instance_type
+      instance_type   = var.client_instance_type
       instance_count  = { min : local.numOfReaders, max : 15, desired : local.numOfReaders },
       security_groups = []
       subnets_ids     = []
