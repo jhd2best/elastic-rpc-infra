@@ -1,3 +1,9 @@
+output "tiup_pd_public_ip" {
+  description = "the public ip of pd node include tiup tool"
+  value       = "${local.pd_tiup_public_ip}"
+  depends_on  = [null_resource.launch_tikv]
+}
+
 output "tkiv_pd_url" {
   description = "the domain include all pd nodes for the tkiv cluster"
   value       = "${local.pd_domain}:2379"
@@ -18,4 +24,10 @@ output "pd_private_ips" {
 output "data_private_ips" {
   description = "the private ip for each data node in tkiv cluster"
   value       = local.data_private_ips
+}
+
+output "node_private_key" {
+  description = "the private key for each node in tkiv cluster"
+  value       = tls_private_key.tikv_nodes.private_key_pem
+  sensitive   = true
 }

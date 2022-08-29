@@ -1,0 +1,9 @@
+global:
+  user: "tikv"
+  ssh_port: 22
+  deploy_dir: "/home/tikv/tikv-deploy"
+  data_dir: "/data/tikv-data"
+tikv_servers:
+%{ for host in data_hosts ~}
+  - host: "${host}"
+%{ endfor ~}
